@@ -33,8 +33,10 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(title, {
       body: payload.body || "",
-      icon: "/favicon.svg",
-      badge: "/favicon.svg",
+      // PNG, not the SVG: Android will not reliably render an SVG in a
+      // notification, and a notification with no icon is easy to ignore.
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
       // Alerts about the same thing replace each other rather than stacking up.
       // This matters more here than on most sites: a nine-step garment would
       // otherwise leave nine separate notices on a lock screen.

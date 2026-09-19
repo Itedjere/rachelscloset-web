@@ -121,3 +121,24 @@ export const api = {
   delete: <T>(path: string, options?: Omit<RequestOptions, "method" | "body">) =>
     request<T>(path, { ...options, method: "DELETE" }),
 };
+
+/**
+ * Files are streamed from an authenticated endpoint, so a plain <img src> or
+ * <audio src> will not work -- the browser sends no Authorization header. Fetch
+ * it and hand back an object URL instead. Callers must revoke it when done.
+ *
+ * This is the cost of never exposing a file by direct URL, and it is a cost
+ * worth paying: the same endpoint serves photographs of somebody's body.
+ */
+export async function fetchFileObjectUrl(url: string, signal?: AbortSignal): Promise<string> {
+  const token = getToken();
+
+  const response = await fetch(`${BASE_URL}${url}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    signal,
+  });
+
+  if (!response.ok) throw new ApiError("Could not load file", { status: response.status });
+
+  return URL.createObjectURL(await response.blob());
+}

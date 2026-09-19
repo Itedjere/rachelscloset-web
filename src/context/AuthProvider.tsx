@@ -3,8 +3,13 @@ import { api, getToken, setToken } from "../lib/api";
 import type { User } from "../types/api";
 import { AuthContext } from "./authContext";
 
+/*
+ * `/me` answers with `data`, while `/login` answers with `token` and `user`.
+ * The two really are different shapes -- one is a resource, the other is a
+ * sign-in result -- so they get two types rather than one hopeful guess.
+ */
 interface MeResponse {
-  user: User;
+  data: User;
 }
 
 interface LoginResponse {
@@ -27,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     api
       .get<MeResponse>("/me")
       .then((response) => {
-        if (!cancelled) setUser(response.user);
+        if (!cancelled) setUser(response.data);
       })
       .catch(() => {
         // A token the API no longer honours -- expired, revoked, or a suspended
@@ -62,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, signIn, signOut }),
+    () => ({ user, loading, signIn, signOut, setUser }),
     [user, loading, signIn, signOut],
   );
 

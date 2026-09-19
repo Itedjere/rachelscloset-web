@@ -6,6 +6,8 @@ export interface AuthValue {
   loading: boolean;
   signIn: (identifier: string, pin: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Replaces the cached account after an edit, so the header updates too. */
+  setUser: (user: User) => void;
 }
 
 /*

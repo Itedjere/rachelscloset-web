@@ -11,7 +11,7 @@ export type PushState =
   | "denied";
 
 interface Config {
-  data: { enabled: boolean; public_key: string | null };
+  data: { push: { enabled: boolean; public_key: string | null } };
 }
 
 /**
@@ -79,12 +79,12 @@ export function usePushNotifications() {
       }
 
       try {
-        const config = await api.get<Config>("/push/config");
+        const config = await api.get<Config>("/config");
         if (cancelled) return;
 
-        setPublicKey(config.data.public_key);
+        setPublicKey(config.data.push.public_key);
 
-        if (!config.data.enabled || !config.data.public_key) {
+        if (!config.data.push.enabled || !config.data.push.public_key) {
           setState("unconfigured");
           return;
         }

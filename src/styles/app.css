@@ -9,51 +9,64 @@
  * Everything below is custom properties, so the palette is a nine-line change.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Monda:wght@400..700&family=Zilla+Slab:ital,wght@0,500;0,600;0,700;1,500&display=swap");
 
 :root {
-  --bg: #faf8f7;
+  /*
+   * MIRROR. The canonical copy of these tokens is
+   * rachelscloset-api/public/css/design-system.css, which the public Blade site
+   * uses. Duplicated rather than shared through a build step: the two repos
+   * deploy separately, and a broken import between them would take down a
+   * public page that a printed QR code points at. Change one, change both.
+   */
+  --bone: #fcfaff;
+  --bg: #fcfaff;
+  --cream: #f2ecf8;
   --surface: #ffffff;
-  --surface-2: #f4f0ef;
-  --line: #e8e2e0;
-  --line-strong: #d6cdca;
-  --ink: #1a1618;
-  --ink-soft: #5e5458;
-  --ink-mute: #8f8489;
-  --plum: #7a4b63;
-  --plum-deep: #5c3549;
-  --plum-tint: #f4e9ee;
-  --gold: #b8863b;
-  --gold-tint: #faf0dd;
-  --success: #2e8b3d;
+  --surface-2: #f7f2fb;
+  --line: #e6dced;
+  --line-strong: #cfc0dc;
+  --ink: #1e1726;
+  --ink-soft: #574c63;
+  --ink-mute: #877b93;
+  --plum: #8257bd;
+  --plum-deep: #4a2d78;
+  --plum-tint: #f3edfa;
+  --gold: #b08d4e;
+  --gold-soft: #e2cda0;
+  --gold-tint: #faf4e8;
+  --success: #2e7d3c;
   --success-tint: #e6f4e4;
-  --danger: #d14343;
+  --danger: #c0392f;
   --danger-tint: #fbe7e7;
-  --shadow: 0 1px 2px rgba(26, 22, 24, 0.04), 0 8px 24px rgba(26, 22, 24, 0.06);
-  --shadow-sm: 0 1px 2px rgba(26, 22, 24, 0.05);
+  --shadow: 0 2px 4px rgba(37, 21, 64, 0.04), 0 12px 32px rgba(37, 21, 64, 0.09);
+  --shadow-sm: 0 1px 2px rgba(37, 21, 64, 0.06);
   --radius: 12px;
 }
 
 [data-theme="dark"] {
-  --bg: #141013;
-  --surface: #1c171a;
-  --surface-2: #231d21;
-  --line: #302930;
-  --line-strong: #453b43;
-  --ink: #f4f1f2;
-  --ink-soft: #bcb2b7;
-  --ink-mute: #857a80;
-  --plum: #d093ad;
-  --plum-deep: #e5b2c8;
-  --plum-tint: #33202a;
-  --gold: #d9ab63;
-  --gold-tint: #352a18;
+  --bone: #141019;
+  --bg: #141019;
+  --cream: #1c1626;
+  --surface: #1c1626;
+  --surface-2: #251d31;
+  --line: #332a42;
+  --line-strong: #4a3d5c;
+  --ink: #f4f0f8;
+  --ink-soft: #c0b6cc;
+  --ink-mute: #8c8199;
+  --plum: #c2a0ea;
+  --plum-deep: #d9c2f5;
+  --plum-tint: #2c1f3d;
+  --gold: #dbbd7f;
+  --gold-soft: #eeddb4;
+  --gold-tint: #2e2617;
   --success: #6bc97c;
   --success-tint: #1b3320;
-  --danger: #f17575;
+  --danger: #ef7d73;
   --danger-tint: #3a1e1e;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -64,7 +77,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Inter", -apple-system, sans-serif;
+  font-family: "Monda", -apple-system, sans-serif;
   /* 16px, not the 15 BizyFarmers uses. Read on a cheap phone in a shop, often
      by somebody who finds reading hard, and an extra pixel costs nothing. */
   font-size: 16px;
@@ -74,7 +87,8 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Manrope", "Inter", sans-serif;
+  font-family: "Zilla Slab", Georgia, serif;
+  font-weight: 600;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.01em;
@@ -91,29 +105,6 @@ a {
   max-width: 880px;
   margin: 0 auto;
   padding: 0 20px;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-
-.topbar .wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 60px;
-}
-
-.brand {
-  font-family: "Manrope", sans-serif;
-  font-weight: 800;
-  font-size: 17px;
-  color: var(--plum);
-  margin-right: auto;
 }
 
 .page {
@@ -402,4 +393,705 @@ a {
 .device .label {
   flex: 1;
   font-weight: 600;
+}
+
+/* ---- Avatars ------------------------------------------------------------- */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--plum-tint);
+  color: var(--plum-deep);
+  font-family: "Zilla Slab", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  /* Initials rather than a silhouette: forty identical grey outlines is a
+     directory nobody can scan. */
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---- Voice notes --------------------------------------------------------- */
+
+/* Rebuilt from tokens rather than using <audio controls>: every browser renders
+   its own shadow DOM for that, and this control is how a tailor reads a step. */
+.voice-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+/* The largest, most obvious thing on the row, on purpose. Listening is the
+   primary way the step library is read. */
+.voice-note .play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--plum);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.voice-note .play:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.voice-note.compact .play {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+
+.voice-note .waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  height: 28px;
+  cursor: pointer;
+}
+
+.voice-note .waveform:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.voice-note .waveform span {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 1px;
+  background: var(--line-strong);
+}
+
+.voice-note .waveform span.played {
+  background: var(--plum);
+}
+
+.voice-note-time {
+  flex: none;
+  min-width: 42px;
+  text-align: right;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mute);
+}
+
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recorder .size {
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+
+.recorder .error {
+  width: 100%;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.btn.danger {
+  background: var(--danger);
+}
+
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  animation: rec-pulse 1s ease-in-out infinite;
+}
+
+@keyframes rec-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rec-dot {
+    animation: none;
+  }
+}
+
+/* ---- Attachments --------------------------------------------------------- */
+
+.attachment-image {
+  display: block;
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.attachment-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.field input:disabled {
+  background: var(--surface-2);
+  color: var(--ink-mute);
+  cursor: not-allowed;
+}
+
+/* ---- Step library --------------------------------------------------------- */
+
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 260px) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.step-row.retired {
+  opacity: 0.55;
+}
+
+.step-row__main h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.step-row__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .step-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A step with no recording is the thing an admin most needs to see. */
+.silent {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--danger);
+  background: var(--danger-tint);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.switch-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.switch-inline input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--plum);
+}
+
+/* ---- Arrangement ---------------------------------------------------------- */
+
+.arrangement {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  counter-reset: stage;
+}
+
+.arrangement__step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+/* Big, because on a small screen the number is how somebody keeps their place
+   in a list they are rearranging. */
+.arrangement__number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--plum-tint);
+  color: var(--plum);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.arrangement__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* Not stretch: a flex column stretches its children to full width, which
+     turned the "no recording" pill into a full-width bar. */
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* The player is the exception — it wants the whole row. */
+.arrangement__body .voice-note {
+  align-self: stretch;
+}
+
+.arrangement__body h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Arrows, not drag and drop. 44px targets, and they sit in a fixed column so
+   a thumb finds the same place on every row. */
+.arrangement__arrows {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arrangement__arrows .icon-btn {
+  font-size: 18px;
+  border: 1px solid var(--line);
+}
+
+.arrangement__arrows .icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 620px) {
+  .arrangement__step {
+    flex-wrap: wrap;
+  }
+
+  .arrangement__arrows {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled) {
+  border-style: solid;
+  border-color: var(--plum);
+  color: var(--plum);
+}
+
+
+/* ===========================================================================
+   The signed-in shell
+   =========================================================================== */
+
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 62px;
+  padding: 0 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.app-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  font-family: "Zilla Slab", Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--plum);
+}
+
+.app-header .brand img {
+  border-radius: 7px;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Only below the sidebar breakpoint. The header otherwise carries nothing but
+   the brand, the theme, the bell and the avatar. */
+.app-header__menu {
+  display: none;
+}
+
+.shell__body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  min-height: 0;
+}
+
+/* ---- Sidebar ------------------------------------------------------------- */
+
+.sidebar {
+  position: sticky;
+  top: 62px;
+  flex: none;
+  width: 248px;
+  height: calc(100dvh - 62px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 12px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.sidebar__group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar__heading {
+  margin: 0 0 8px;
+  padding-left: 12px;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.sidebar__link,
+.sidebar__signout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* 44px, tapped by a thumb. */
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar__link:hover,
+.sidebar__signout:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* The current page, marked by a filled ground rather than only a colour, so it
+   survives being looked at on a cheap screen in daylight. */
+.sidebar__link.is-active {
+  background: var(--plum-tint);
+  color: var(--plum);
+  font-weight: 600;
+}
+
+.sidebar__signout {
+  color: var(--danger);
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 10px 10px;
+  padding-top: 8px;
+}
+
+.sidebar__scrim {
+  display: none;
+}
+
+/* ---- Page ---------------------------------------------------------------- */
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 24px 80px;
+}
+
+.app-main__inner {
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+@media (max-width: 900px) {
+  .app-header__menu {
+    display: inline-flex;
+  }
+
+  /*
+   * Off-canvas. `transform` rather than `display`, so it slides rather than
+   * appearing, and so it is never in the layout to push the page sideways.
+   */
+  .sidebar {
+    position: fixed;
+    top: 62px;
+    left: 0;
+    z-index: 45;
+    width: min(280px, 82vw);
+    transform: translateX(-102%);
+    transition: transform var(--dur, 320ms) cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar.is-open {
+    transform: none;
+  }
+
+  .sidebar__scrim {
+    display: block;
+    position: fixed;
+    inset: 62px 0 0;
+    z-index: 44;
+    border: 0;
+    padding: 0;
+    background: rgba(20, 12, 34, 0.5);
+    cursor: pointer;
+  }
+
+  .app-main {
+    padding: 22px 16px 80px;
+  }
+}
+
+/* The brand word is the first thing to go when the bar gets tight; the mark
+   still identifies it. */
+@media (max-width: 460px) {
+  .app-header .brand span {
+    display: none;
+  }
+}
+
+/* ---- Avatar menu --------------------------------------------------------- */
+
+.avatar-menu {
+  position: relative;
+}
+
+.avatar-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 4px 0 2px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-mute);
+  cursor: pointer;
+}
+
+.avatar-menu__trigger:hover {
+  background: var(--surface-2);
+}
+
+.avatar-menu__chevron {
+  display: inline-flex;
+  transition: transform 180ms ease;
+}
+
+.avatar-menu__chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+.avatar-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  width: 250px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.avatar-menu__who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 6px;
+}
+
+.avatar-menu__who .name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.avatar-menu__who .meta {
+  font-size: 0.75rem;
+  color: var(--ink-mute);
+}
+
+.avatar-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.avatar-menu__item:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.avatar-menu__item.danger {
+  color: var(--danger);
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 9px 9px;
+}
+
+/* ---- Utility ------------------------------------------------------------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Dashboard tiles ------------------------------------------------------ */
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  display: block;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: inherit;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--plum);
+}
+
+.tile svg {
+  color: var(--plum);
+}
+
+.tile h2 {
+  font-size: 1.0625rem;
+  margin: 10px 0 6px;
+}
+
+.tile p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
 }
