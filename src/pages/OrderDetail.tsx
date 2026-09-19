@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
+import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
 import OrderTracker from "../components/OrderTracker";
 import { useAuth } from "../hooks/useAuth";
@@ -96,6 +97,17 @@ export default function OrderDetail() {
             </div>
           </div>
         </div>
+
+        {/*
+          A live order is itself the permission -- see MeasurementAccess -- so
+          the link belongs here, where she is already looking at the garment
+          she needs the numbers for, rather than in a menu.
+        */}
+        {isTailor && other?.id ? (
+          <Link className="btn quiet" to={`/customers/${other.id}/measurements`}>
+            <Icon name="ruler" size={16} /> Her measurements
+          </Link>
+        ) : null}
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>

@@ -6,7 +6,10 @@ import AlertSettings from "./pages/AlertSettings";
 import Home from "./pages/Home";
 import Arrangement from "./pages/Arrangement";
 import BankAccount from "./pages/BankAccount";
+import Claim from "./pages/Claim";
 import Garments from "./pages/Garments";
+import MeasurementAccess from "./pages/MeasurementAccess";
+import Measurements from "./pages/Measurements";
 import Notifications from "./pages/Notifications";
 import OrderDetail from "./pages/OrderDetail";
 import OrderNew from "./pages/OrderNew";
@@ -23,6 +26,15 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/sign-in" element={<SignIn />} />
+
+        {/*
+          Claiming is deliberately outside ProtectedRoute: the whole point is
+          that this person has no account yet. Both spellings exist because
+          the QR and WhatsApp channels carry a token and the spoken-code
+          channel carries nothing at all.
+        */}
+        <Route path="/claim" element={<Claim />} />
+        <Route path="/claim/:token" element={<Claim />} />
 
         <Route
           path="/"
@@ -81,6 +93,33 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        {/* Her own. */}
+        <Route
+          path="/measurements"
+          element={
+            <ProtectedRoute>
+              <Measurements />
+            </ProtectedRoute>
+          }
+        />
+        {/* A customer's, for the tailor working with her. */}
+        <Route
+          path="/customers/:customerId/measurements"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <Measurements />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/settings/measurement-access"
+          element={
+            <ProtectedRoute>
+              <MeasurementAccess />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/garments"
           element={

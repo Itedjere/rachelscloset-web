@@ -48,6 +48,13 @@ const GROUPS: Group[] = [
     items: [
       { to: "/notifications", label: "Notifications", icon: "bell" },
       { to: "/profile", label: "Your details", icon: "user" },
+      { to: "/measurements", label: "Your measurements", icon: "ruler", allow: ["customer"] },
+      {
+        to: "/settings/measurement-access",
+        label: "Who can see your measurements",
+        icon: "lock",
+        allow: ["customer"],
+      },
       { to: "/settings/bank", label: "Where you get paid", icon: "check", allow: ["tailor"] },
       { to: "/settings/alerts", label: "Alerts", icon: "cog" },
     ],

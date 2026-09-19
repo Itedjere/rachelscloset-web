@@ -163,3 +163,57 @@ export interface FoundCustomer {
   avatar_url: string | null;
   claimed: boolean;
 }
+
+/* ---- Measurements (Section 11) ------------------------------------------ */
+
+export interface MeasurementValue {
+  id: number;
+  label: string;
+  value: string;
+  unit: string | null;
+}
+
+/** The photograph is the record; `values` is the optional typed version. */
+export interface MeasurementSet {
+  id: number;
+  label: string | null;
+  notes: string | null;
+  taken_on: string | null;
+  photo_url: string | null;
+  recorded_by: { id: number; name: string } | null;
+  values: MeasurementValue[];
+  created_at: string;
+}
+
+/** One row of "who can see my measurements". */
+export interface MeasurementAccessRow {
+  /** Null for a tailor whose access comes from a live order and no link. */
+  id: number | null;
+  tailor: {
+    id: number | null;
+    name: string | null;
+    business_name: string | null;
+    avatar_url: string | null;
+  };
+  granted: boolean;
+  granted_at: string | null;
+  revoked_at: string | null;
+  has_live_order: boolean;
+  /** Whether revoking would actually stop her seeing them today. */
+  can_see_now: boolean;
+  reason: string;
+}
+
+export interface ClaimInvite {
+  code: string;
+  link: string;
+  qr_svg: string;
+  whatsapp_url: string;
+  expires_at: string;
+}
+
+export interface ClaimPreview {
+  name: string;
+  invited_by: string | null;
+  invited_by_business: string | null;
+}

@@ -54,6 +54,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(response.user);
   }, []);
 
+  /**
+   * Take up a session somebody else's endpoint already issued.
+   *
+   * Claiming a profile ends with a token and a user, because setting a PIN
+   * proves who she is just as well as typing it into the sign-in form would.
+   * Making her sign in again immediately afterwards would be asking her to
+   * prove the same thing twice, four seconds apart.
+   */
+  const adoptSession = useCallback((token: string, claimed: User) => {
+    setToken(token);
+    setUser(claimed);
+  }, []);
+
   const signOut = useCallback(async () => {
     try {
       await api.post("/logout");
@@ -67,8 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, signIn, signOut, setUser }),
-    [user, loading, signIn, signOut],
+    () => ({ user, loading, signIn, adoptSession, signOut, setUser }),
+    [user, loading, signIn, adoptSession, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

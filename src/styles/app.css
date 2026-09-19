@@ -1651,3 +1651,188 @@ a {
   align-items: center;
   gap: 6px;
 }
+
+/* ---- Measurements and consent (Section 11) --------------------------------
+
+   The photograph is the record, so it is the largest thing on the card and
+   nothing competes with it. The typed numbers, where a tailor entered them,
+   read as a reference table underneath rather than as the point.
+   --------------------------------------------------------------------------- */
+
+.measurement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.measurement {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.measurement-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.measurement .attachment-image {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.measurement-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.measurement-values div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.measurement-values dt {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.measurement-values dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The camera target when recording. Big, because it is the only required
+   field on the form and the one thing that must not be missed. */
+.measurement-shot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 160px;
+  margin-bottom: 14px;
+  padding: 18px;
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.measurement-shot:hover {
+  border-color: var(--plum);
+  color: var(--plum);
+}
+
+.measurement-shot img {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 8px;
+}
+
+.measurement-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* ---- The invite ----------------------------------------------------------- */
+
+.invite {
+  border-color: var(--gold-soft);
+  background: var(--gold-tint);
+}
+
+.invite-channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 12px;
+}
+
+.invite-qr {
+  flex: none;
+  text-align: center;
+}
+
+/* The QR arrives as an SVG string with its own dimensions; this is what
+   makes it a sensible size on a phone held up to another phone. */
+.invite-qr-image {
+  width: 180px;
+  height: 180px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.invite-qr-image svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.invite-rest {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.invite-code strong {
+  display: block;
+  font-size: 30px;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---- Consent -------------------------------------------------------------- */
+
+.consent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.consent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.consent-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.consent-action {
+  flex: none;
+  margin-left: auto;
+}
+
+/* The caveat spans the card rather than sitting beside the button, because
+   it qualifies the button. */
+.consent .notice {
+  flex: 1 1 100%;
+  margin: 0;
+}

@@ -40,6 +40,12 @@ const GLYPHS: Record<string, Glyph> = {
     path: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5L9 3h6l2.5 3H21a2 2 0 0 1 2 2Z",
     circles: [[12, 13, 3.6]],
   },
+  // A tape measure, for measurements.
+  ruler: { path: "M2 9h20v6H2zM6 9v3M10 9v4M14 9v3M18 9v4" },
+
+  // A padlock, for consent.
+  lock: { path: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4" },
+
   trash: { path: "M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" },
   menu: { path: "M3 6h18M3 12h18M3 18h18" },
   close: { path: "M18 6 6 18M6 6l12 12" },
