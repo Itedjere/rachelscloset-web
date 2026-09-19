@@ -100,6 +100,12 @@ export interface OrderParty {
  * step library -- renaming a library step must not rewrite a timeline she has
  * already read. See the order_steps migration.
  */
+export interface StepPhoto {
+  id: number;
+  url: string;
+  created_at: string;
+}
+
 export interface OrderStep {
   id: number;
   position: number;
@@ -108,6 +114,7 @@ export interface OrderStep {
   voice_note_url: string | null;
   complete: boolean;
   completed_at: string | null;
+  photos?: StepPhoto[];
 }
 
 export interface Order {
@@ -127,6 +134,7 @@ export interface Order {
   collected_at: string | null;
   steps_total: number;
   steps_completed: number;
+  steps_with_photo: number;
   steps?: OrderStep[];
   can_release: boolean;
   payout?: {

@@ -3,11 +3,12 @@ import { useAttachment } from "../hooks/useAttachment";
 import { api, errorMessage } from "../lib/api";
 import type { OrderStep } from "../types/api";
 import AudioPlayer from "./AudioPlayer";
+import StepPhotos from "./StepPhotos";
 
 interface OrderTrackerProps {
   orderId: number;
   steps: OrderStep[];
-  /** Only the tailor may tick. The customer reads the same list. */
+  /** Only the tailor may tick, and photograph. The customer reads the list. */
   canTick: boolean;
   /** Ticking the last stage can change the order's status, so the page reloads. */
   onChanged: () => void;
@@ -76,18 +77,20 @@ export default function OrderTracker({ orderId, steps, canTick, onChanged }: Ord
         {view.map((step) => (
           <TrackerRow
             key={step.id}
+            orderId={orderId}
             step={step}
             canTick={canTick}
             busy={busyId === step.id}
             onToggle={(next) => void toggle(step, next)}
+            onChanged={onChanged}
           />
         ))}
       </ol>
 
       {canTick ? (
         <p className="hint">
-          Tap a circle as you finish that stage. She is told each time. Tap it again if you
-          tapped the wrong one.
+          Tap a circle as you finish that stage — she is told each time, and you can tap it
+          again if you tapped the wrong one. Add a photo to show her the work.
         </p>
       ) : null}
     </div>
@@ -95,13 +98,15 @@ export default function OrderTracker({ orderId, steps, canTick, onChanged }: Ord
 }
 
 interface TrackerRowProps {
+  orderId: number;
   step: OrderStep;
   canTick: boolean;
   busy: boolean;
   onToggle: (next: boolean) => void;
+  onChanged: () => void;
 }
 
-function TrackerRow({ step, canTick, busy, onToggle }: TrackerRowProps) {
+function TrackerRow({ orderId, step, canTick, busy, onToggle, onChanged }: TrackerRowProps) {
   const { objectUrl } = useAttachment(step.voice_note_url);
 
   /*
@@ -140,6 +145,16 @@ function TrackerRow({ step, canTick, busy, onToggle }: TrackerRowProps) {
         {/* Listening is how a tailor who reads poorly knows what this stage
             means, so the player sits on the row rather than behind a tap. */}
         {step.voice_note_url ? <AudioPlayer src={objectUrl} loading={!objectUrl} compact /> : null}
+
+        {/* Proof. Showing the work is what makes the tick above checkable. */}
+        <StepPhotos
+          orderId={orderId}
+          stepId={step.id}
+          label={step.label}
+          photos={step.photos ?? []}
+          canEdit={canTick}
+          onChanged={onChanged}
+        />
       </div>
     </li>
   );

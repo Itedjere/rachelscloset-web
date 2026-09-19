@@ -34,6 +34,13 @@ const GLYPHS: Record<string, Glyph> = {
   cog: { path: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6", circles: [[12, 12, 9]] },
   user: { path: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2", circles: [[12, 7, 4]] },
   chevron: { path: "m6 9 6 6 6-6" },
+
+  // A camera, for proof of work. The lens is the circle.
+  camera: {
+    path: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5L9 3h6l2.5 3H21a2 2 0 0 1 2 2Z",
+    circles: [[12, 13, 3.6]],
+  },
+  trash: { path: "M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" },
   menu: { path: "M3 6h18M3 12h18M3 18h18" },
   close: { path: "M18 6 6 18M6 6l12 12" },
 };
