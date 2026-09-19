@@ -5,8 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 /*
  * A placeholder dashboard, and honest about it.
  *
- * The real one belongs to the sections that build orders and the production
- * tracker; inventing figures here now would only have to be torn out. What it
+ * The real one -- figures, and what needs attention today -- is Section 17.
+ * Inventing those numbers here now would only have to be torn out. What this
  * does do is point at the parts that are finished, so somebody signing in can
  * find them without reading the sidebar twice.
  *
@@ -16,6 +16,7 @@ import { useAuth } from "../hooks/useAuth";
 export default function Home() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const isTailor = user?.role === "tailor";
 
   return (
     <>
@@ -23,12 +24,27 @@ export default function Home() {
         <h1>Hello, {user?.name}</h1>
         <p>
           {isAdmin
-            ? "Orders and the production tracker are not built yet. The step library is."
-            : "Orders and the production tracker are not built yet. You can already set up how your work is arranged."}
+            ? "Every order on the platform, and the library the stages come from."
+            : isTailor
+              ? "Your orders, and how each garment is coming along."
+              : "Your orders, and how far along each one is."}
         </p>
       </div>
 
       <div className="tile-grid">
+        {/* First, because it is what the platform is for. */}
+        <Link className="tile" to={isAdmin ? "/admin/orders" : "/orders"}>
+          <Icon name="check" size={22} />
+          <h2>{isAdmin ? "All orders" : "Orders"}</h2>
+          <p>
+            {isAdmin
+              ? "Every order, what has been paid, and what is owed."
+              : isTailor
+                ? "Tick off each stage as you finish it. She is told every time."
+                : "Follow each stage of your garment as your tailor finishes it."}
+          </p>
+        </Link>
+
         <Link className="tile" to="/garments">
           <Icon name="garment" size={22} />
           <h2>Garments</h2>
@@ -46,6 +62,16 @@ export default function Home() {
             <p>
               Every stage a garment can pass through — and the recording of what each one means.
             </p>
+          </Link>
+        ) : null}
+
+        {/* A tailor with no bank details still gets paid, but the money waits
+            as `pending` -- worth a tile rather than being buried in settings. */}
+        {isTailor ? (
+          <Link className="tile" to="/settings/bank">
+            <Icon name="check" size={22} />
+            <h2>Where you get paid</h2>
+            <p>The account we send your money to once an order is finished.</p>
           </Link>
         ) : null}
 

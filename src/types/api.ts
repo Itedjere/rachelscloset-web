@@ -76,3 +76,82 @@ export interface Arrangement {
   is_default: boolean;
   steps: ArrangedStep[];
 }
+
+export type OrderStatus =
+  | "pending_payment"
+  | "in_progress"
+  | "ready"
+  | "collected"
+  | "completed"
+  | "cancelled"
+  | "disputed";
+
+export interface OrderParty {
+  id: number;
+  name: string;
+  phone: string;
+  avatar_url: string | null;
+}
+
+/**
+ * One stage of an order, as the customer was shown it.
+ *
+ * These are snapshots taken when the order was opened, not live reads of the
+ * step library -- renaming a library step must not rewrite a timeline she has
+ * already read. See the order_steps migration.
+ */
+export interface OrderStep {
+  id: number;
+  position: number;
+  label: string;
+  instructions: string | null;
+  voice_note_url: string | null;
+  complete: boolean;
+  completed_at: string | null;
+}
+
+export interface Order {
+  id: number;
+  reference: string;
+  status: OrderStatus;
+  description: string | null;
+  amount: string;
+  deposit_amount: string;
+  paid_total: string;
+  amount_due_up_front: string;
+  is_paid_up_front: boolean;
+  escrow: boolean;
+  due_date: string | null;
+  ready_at: string | null;
+  collection_deadline: string | null;
+  collected_at: string | null;
+  steps_total: number;
+  steps_completed: number;
+  steps?: OrderStep[];
+  can_release: boolean;
+  payout?: {
+    net_amount: string;
+    refunded_amount: string;
+    status: "pending" | "released" | "failed";
+    failure_reason: string | null;
+  } | null;
+  payments?: {
+    id: number;
+    reference: string;
+    amount: string;
+    status: "pending" | "successful" | "failed";
+    paid_at: string | null;
+  }[];
+  garment_type?: { id: number; name: string };
+  customer?: OrderParty;
+  tailor?: OrderParty;
+  created_at: string;
+}
+
+export interface FoundCustomer {
+  id: number;
+  name: string;
+  phone: string;
+  avatar_url: string | null;
+  claimed: boolean;
+}

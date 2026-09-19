@@ -31,17 +31,24 @@ const GROUPS: Group[] = [
   },
   {
     heading: "Production",
-    items: [{ to: "/garments", label: "Garments", icon: "garment" }],
+    items: [
+      { to: "/orders", label: "Orders", icon: "check" },
+      { to: "/garments", label: "Garments", icon: "garment" },
+    ],
   },
   {
     heading: "Administration",
-    items: [{ to: "/admin/steps", label: "Step library", icon: "list", allow: ["admin"] }],
+    items: [
+      { to: "/admin/orders", label: "All orders", icon: "list", allow: ["admin"] },
+      { to: "/admin/steps", label: "Step library", icon: "list", allow: ["admin"] },
+    ],
   },
   {
     heading: "Account",
     items: [
       { to: "/notifications", label: "Notifications", icon: "bell" },
       { to: "/profile", label: "Your details", icon: "user" },
+      { to: "/settings/bank", label: "Where you get paid", icon: "check", allow: ["tailor"] },
       { to: "/settings/alerts", label: "Alerts", icon: "cog" },
     ],
   },

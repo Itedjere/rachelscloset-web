@@ -1095,3 +1095,404 @@ a {
   font-size: 0.875rem;
   color: var(--ink-soft);
 }
+
+/* ---- Orders --------------------------------------------------------------- */
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: inherit;
+}
+
+.order-row:hover {
+  border-color: var(--plum);
+}
+
+.order-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.order-row__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-row__money {
+  text-align: right;
+  flex: none;
+}
+
+.order-row__money .hint {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.order-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-parties {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/*
+ * The status, in words a customer would use. Colour alone would not carry it:
+ * these are read on a cheap screen in daylight, so each one is a filled pill
+ * with a written label.
+ */
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending_payment {
+  background: var(--gold-tint);
+  color: #7a5a1a;
+}
+
+.status-in_progress {
+  background: var(--plum-tint);
+  color: var(--plum);
+}
+
+/* The one people are waiting for, so it gets the strongest colour. */
+.status-ready {
+  background: var(--success);
+  color: #fff;
+}
+
+.status-collected,
+.status-completed {
+  background: var(--success-tint);
+  color: var(--success);
+}
+
+.status-cancelled {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+[data-theme="dark"] .status-pending_payment {
+  color: var(--gold-soft);
+}
+
+.facts {
+  margin: 0 0 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.facts > div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.facts dt {
+  color: var(--ink-mute);
+  font-size: 0.875rem;
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.found-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px;
+  background: var(--plum-tint);
+  border-radius: 10px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip.is-on {
+  border-style: solid;
+  border-color: var(--plum);
+  background: var(--plum-tint);
+  color: var(--plum);
+  font-weight: 600;
+}
+
+.field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+/* ---- Bank account --------------------------------------------------------- */
+
+/*
+ * The name the bank returned, given its own block rather than a line of hint
+ * text. This is the moment a transposed digit is caught, so it has to be the
+ * thing the eye lands on.
+ */
+.resolved-name {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--plum-tint);
+  border-radius: 10px;
+}
+
+.resolved-name strong {
+  display: block;
+  font-size: 1.125rem;
+  margin: 2px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.resolved-name .hint {
+  margin: 0;
+}
+
+/* ---- Admin ---------------------------------------------------------------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: var(--ink-mute);
+}
+
+.back-link:hover {
+  color: var(--plum);
+}
+
+/*
+ * A refund moves real money and cannot be undone from here, so the panel is
+ * visually separated from everything else on the page rather than being one
+ * more card an admin scrolls past.
+ */
+.danger-card {
+  border-color: var(--danger);
+}
+
+.danger-card h2 {
+  color: var(--danger);
+}
+
+.confirm-box {
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--danger-tint);
+  border-radius: 10px;
+}
+
+[data-theme="dark"] .confirm-box {
+  background: var(--danger-tint);
+}
+
+.btn.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn.danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* ---------------------------------------------------------------------------
+   The production tracker (Section 9)
+
+   The one screen the whole platform is for. Built for a thumb on a five-inch
+   screen in a workshop: the tick is a 48px circle, not a checkbox, and the
+   voice note sits on the row rather than behind a tap.
+   --------------------------------------------------------------------------- */
+
+.tracker-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tracker-head h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.tracker-head strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--plum);
+}
+
+.tracker-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.tracker-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--plum), var(--gold));
+  /* Slow enough to be seen as movement, which is the acknowledgement of a tap. */
+  transition: width 0.4s ease;
+}
+
+.tracker-steps {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+.tracker-step {
+  display: flex;
+  /* Top, not centre. A stage with three lines of instructions is a tall row,
+     and a centred circle drifts far enough from its label to stop reading as
+     belonging to it -- measured at 55px on a phone. */
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.tracker-step:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.tracker-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Drops the label's first line onto the circle's centre line. */
+  padding-top: 12px;
+}
+
+.tracker-body strong {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.tracker-step.done .tracker-body strong {
+  color: var(--ink-soft);
+}
+
+.tracker-body .hint {
+  margin: 0;
+}
+
+/* The mark is the state: a number before, a tick after. */
+.tracker-mark {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink-mute);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.tracker-mark.done {
+  border-color: var(--success);
+  background: var(--success);
+  color: #ffffff;
+}
+
+/* A button only for the tailor, so the customer's copy has nothing that
+   looks pressable and does nothing. */
+.tracker-tick {
+  flex: none;
+  /* Without this the button stretches to the row and re-centres the circle
+     inside itself, undoing the alignment above. */
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.tracker-tick:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 3px;
+}
+
+.tracker-tick:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.tracker-tick:not(:disabled):hover .tracker-mark {
+  border-color: var(--plum);
+  color: var(--plum);
+}
+
+.tracker-tick:not(:disabled):hover .tracker-mark.done {
+  border-color: var(--success);
+  color: #ffffff;
+}
+
+.tracker-tick:not(:disabled):active .tracker-mark {
+  transform: scale(0.93);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracker-bar span,
+  .tracker-mark {
+    transition: none;
+  }
+}
