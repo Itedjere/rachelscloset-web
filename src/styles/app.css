@@ -1,0 +1,405 @@
+/*
+ * The whole design system, in one file.
+ *
+ * BizyFarmers grew two stylesheets -- a mockup copy kept faithful for re-syncing,
+ * and a second file of supplements -- and the seam cost more than the re-syncing
+ * ever saved. There is no mockup to stay faithful to here, so there is one token
+ * set and one place a colour is defined.
+ *
+ * Everything below is custom properties, so the palette is a nine-line change.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  --bg: #faf8f7;
+  --surface: #ffffff;
+  --surface-2: #f4f0ef;
+  --line: #e8e2e0;
+  --line-strong: #d6cdca;
+  --ink: #1a1618;
+  --ink-soft: #5e5458;
+  --ink-mute: #8f8489;
+  --plum: #7a4b63;
+  --plum-deep: #5c3549;
+  --plum-tint: #f4e9ee;
+  --gold: #b8863b;
+  --gold-tint: #faf0dd;
+  --success: #2e8b3d;
+  --success-tint: #e6f4e4;
+  --danger: #d14343;
+  --danger-tint: #fbe7e7;
+  --shadow: 0 1px 2px rgba(26, 22, 24, 0.04), 0 8px 24px rgba(26, 22, 24, 0.06);
+  --shadow-sm: 0 1px 2px rgba(26, 22, 24, 0.05);
+  --radius: 12px;
+}
+
+[data-theme="dark"] {
+  --bg: #141013;
+  --surface: #1c171a;
+  --surface-2: #231d21;
+  --line: #302930;
+  --line-strong: #453b43;
+  --ink: #f4f1f2;
+  --ink-soft: #bcb2b7;
+  --ink-mute: #857a80;
+  --plum: #d093ad;
+  --plum-deep: #e5b2c8;
+  --plum-tint: #33202a;
+  --gold: #d9ab63;
+  --gold-tint: #352a18;
+  --success: #6bc97c;
+  --success-tint: #1b3320;
+  --danger: #f17575;
+  --danger-tint: #3a1e1e;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, sans-serif;
+  /* 16px, not the 15 BizyFarmers uses. Read on a cheap phone in a shop, often
+     by somebody who finds reading hard, and an extra pixel costs nothing. */
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Manrope", "Inter", sans-serif;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---- Layout ------------------------------------------------------------- */
+
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar .wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+}
+
+.brand {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--plum);
+  margin-right: auto;
+}
+
+.page {
+  padding: 28px 0 80px;
+}
+
+.page-head {
+  margin-bottom: 20px;
+}
+
+.page-head p {
+  color: var(--ink-soft);
+  margin: 6px 0 0;
+}
+
+/* ---- Controls ----------------------------------------------------------- */
+
+/* 44px minimum on anything tappable. A thumb in a busy shop is not a mouse. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--plum);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--plum-deep);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.btn.quiet {
+  background: transparent;
+  color: var(--plum);
+  padding: 0 10px;
+}
+
+.btn.block {
+  width: 100%;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* ---- Forms -------------------------------------------------------------- */
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 1px;
+}
+
+.field input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+/* The PIN box. Six digits, widely spaced, because it is typed on a numeric
+   keypad by somebody who is counting the characters rather than reading them. */
+.field input.pin {
+  font-size: 24px;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding-left: 0.5em;
+}
+
+.field .hint,
+.field .error {
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.field .hint {
+  color: var(--ink-mute);
+}
+
+.field .error {
+  color: var(--danger);
+}
+
+/* ---- Cards and notices --------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.form-card {
+  max-width: 420px;
+  margin: 48px auto;
+}
+
+.notice {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.notice.bad {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.notice.info {
+  background: var(--gold-tint);
+  color: var(--ink-soft);
+}
+
+.empty {
+  text-align: center;
+  color: var(--ink-mute);
+  padding: 48px 20px;
+}
+
+/* ---- Notifications ------------------------------------------------------- */
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 14px 16px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Unread is a coloured edge, not a colour wash: it reads at a glance without
+   depending on anybody noticing a shade of grey. */
+.notification.unread {
+  border-left: 4px solid var(--plum);
+  background: var(--plum-tint);
+}
+
+.notification .title {
+  font-weight: 600;
+}
+
+.notification .when {
+  font-size: 13px;
+  color: var(--ink-mute);
+  margin-top: 4px;
+}
+
+/* ---- Switch rows --------------------------------------------------------- */
+
+.switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.switch-row:last-child {
+  border-bottom: 0;
+}
+
+.switch-row .text {
+  flex: 1;
+}
+
+.switch-row .text .label {
+  font-weight: 600;
+}
+
+.switch-row .text .hint {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.switch-row input[type="checkbox"] {
+  width: 26px;
+  height: 26px;
+  margin-top: 4px;
+  accent-color: var(--plum);
+  flex: none;
+}
+
+.row-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.device:last-child {
+  border-bottom: 0;
+}
+
+.device .label {
+  flex: 1;
+  font-weight: 600;
+}
