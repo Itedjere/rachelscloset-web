@@ -2229,3 +2229,99 @@ a {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* ---- Subscriptions (Section 14) ------------------------------------------
+
+   Calm on purpose. A lapse hides a tailor from the directory and nothing
+   else -- her orders, her money and her printed card all keep working -- so
+   nothing here is coloured like a failure.
+   --------------------------------------------------------------------------- */
+
+.listing-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--gold-soft);
+  border-radius: var(--radius);
+  background: var(--gold-tint);
+}
+
+.listing-banner > div {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.listing-banner .hint {
+  margin: 4px 0 0;
+}
+
+.listing-banner .btn {
+  flex: none;
+}
+
+/* Out of the directory: still not an alarm, just further from gold. */
+.listing-banner.is-out {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.standing strong {
+  display: block;
+  font-size: 18px;
+}
+
+.standing .hint {
+  margin: 6px 0 0;
+}
+
+.standing--active {
+  border-left: 4px solid var(--success);
+}
+
+.standing--grace {
+  border-left: 4px solid var(--gold);
+}
+
+.standing--lapsed {
+  border-left: 4px solid var(--line-strong);
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.plan h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.plan__price {
+  margin: 8px 0 2px;
+  font-size: 30px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.term-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.term {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.term:first-child {
+  border-top: 0;
+}

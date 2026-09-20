@@ -16,6 +16,8 @@ import OrderDetail from "./pages/OrderDetail";
 import OrderNew from "./pages/OrderNew";
 import OrderPaid from "./pages/OrderPaid";
 import Portfolio from "./pages/Portfolio";
+import Subscription from "./pages/Subscription";
+import SubscriptionPaid from "./pages/SubscriptionPaid";
 import Orders from "./pages/Orders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -153,6 +155,22 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <AdminOrderDetail />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/subscription"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <Subscription />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/subscription/paid"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <SubscriptionPaid />
             </RoleRoute>
           }
         />

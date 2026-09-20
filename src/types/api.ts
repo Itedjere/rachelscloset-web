@@ -292,3 +292,36 @@ export interface BusinessCardData {
   /** One string of '0'/'1' per row. Drawn module by module on canvas. */
   qr: string[];
 }
+
+/* ---- Subscriptions (Section 14) ------------------------------------------ */
+
+export interface SubscriptionPlan {
+  plan: string;
+  days: number;
+  price: string;
+}
+
+export interface SubscriptionTermRow {
+  id: number;
+  plan: string;
+  days: number;
+  amount: string;
+  starts_at: string;
+  ends_at: string;
+  /** True when an admin gave her the days rather than her buying them. */
+  granted: boolean;
+  note: string | null;
+}
+
+export interface SubscriptionState {
+  /** A label for wording only. Decisions read the timestamps. */
+  status: "active" | "grace" | "lapsed";
+  listed: boolean;
+  current_period_end: string | null;
+  grace_ends_at: string | null;
+  days_remaining: number | null;
+  in_grace: boolean;
+  plans: SubscriptionPlan[];
+  grace_days: number;
+  terms: SubscriptionTermRow[];
+}

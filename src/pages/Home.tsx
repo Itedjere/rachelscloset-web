@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
+import ListingBanner from "../components/ListingBanner";
 import { useAuth } from "../hooks/useAuth";
 
 /*
@@ -30,6 +31,10 @@ export default function Home() {
               : "Your orders, and how far along each one is."}
         </p>
       </div>
+
+      {/* Silent unless there is something to say. The backstop for the
+          reminder cron, which is only ever a courtesy. */}
+      <ListingBanner />
 
       <div className="tile-grid">
         {/* First, because it is what the platform is for. */}
