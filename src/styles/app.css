@@ -2102,7 +2102,7 @@ a {
 
 /* ---- The business card (Section 16) --------------------------------------
 
-   The canvas is drawn at print resolution (1004x650, which is 85x55mm at
+   Each canvas is drawn at print resolution (1004x650, which is 85x55mm at
    300dpi) and scaled down here. What gets saved is the full-size file, which
    is the point: it goes to a print shop, not to a screen.
    --------------------------------------------------------------------------- */
@@ -2110,41 +2110,96 @@ a {
 .business-card {
   display: block;
   width: 100%;
-  max-width: 502px;
+  max-width: 460px;
   height: auto;
   border-radius: 10px;
   border: 1px solid var(--line);
-  /* Always white, in both themes: it is a piece of paper, and showing it
-     tinted would misrepresent what the printer will produce. */
-  background: #ffffff;
   box-shadow: var(--shadow-sm);
+}
+
+.card-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .card-preview {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-start;
+  margin: 0;
+}
+
+.card-preview h2 {
+  margin: 0;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---- Choosing the colour -------------------------------------------------- */
+
+.card-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* The swatch IS the choice: each button is painted in the card's own ground
+   so she is picking a card rather than reading two words. */
+.card-theme {
+  min-height: 48px;
+  padding: 10px 18px;
+  border: 2px solid var(--line-strong);
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.card-theme--light {
+  background: #ffffff;
+  color: #251540;
+}
+
+.card-theme--dark {
+  background: #251540;
+  color: #fcfaff;
+}
+
+.card-theme.is-on {
+  border-color: var(--plum);
+  box-shadow: 0 0 0 3px var(--plum-tint);
+}
+
+.card-theme:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 2px;
 }
 
 /*
-   Printing is the secondary action, but it has to produce the card alone --
-   not the sidebar, the header and a page of chrome around it.
+   Printing is the secondary action, but it has to produce the cards alone --
+   not the sidebar, the header and a page of chrome around them.
 */
 @media print {
   .app-header,
   .sidebar,
   .page-head,
-  .row-actions,
+  .card-themes,
   .hint,
-  .notice {
+  .notice,
+  .btn {
     display: none !important;
   }
 
   .page,
   .wrap,
   .card,
-  .card-preview {
+  .card-preview,
+  .card-sides {
     margin: 0;
     padding: 0;
     border: 0;
@@ -2152,12 +2207,25 @@ a {
     background: #ffffff;
   }
 
+  .card-sides {
+    display: block;
+  }
+
+  .card-preview h2 {
+    display: none;
+  }
+
   .business-card {
-    /* Actual size on paper, so it can be cut out. */
+    /* Actual size on paper, so both sides can be cut out. */
     width: 85mm;
     max-width: none;
+    margin: 0 0 8mm;
     border: 1px solid #ccc;
     border-radius: 0;
     box-shadow: none;
+    /* Keep the ink the tailor chose rather than letting a browser
+       "background graphics off" default strip it. */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

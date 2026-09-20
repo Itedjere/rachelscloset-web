@@ -1,29 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../lib/api";
-import { drawBusinessCard } from "../lib/businessCard";
+import { drawBusinessCard, type CardTheme } from "../lib/businessCard";
 import type { BusinessCardData } from "../types/api";
 
 /**
- * Her business card, with the QR that points at her Fashion House page.
+ * Her business card: two sides, two themes.
  *
- * Drawn on a canvas rather than laid out in HTML, for one reason: the
- * primary action here is "save it as a picture", and a canvas can already do
- * that. The alternative is an HTML-to-canvas library, which is a large
- * dependency to add for a screenshot — and rasterising an SVG through an
- * <img> loses the webfonts, which is most of what makes the card look like
- * this platform rather than a template.
+ * Drawn on a canvas rather than laid out in HTML, for one reason: the primary
+ * action here is "save it as a picture", and a canvas can already do that.
+ * The alternative is an HTML-to-canvas library, which is a large dependency
+ * for a screenshot — and rasterising an SVG through an <img> loses the
+ * webfonts, which is most of what makes the card look like this platform.
  *
- * Saving is the primary action and printing is secondary, because a tailor
- * will send this to a print shop on WhatsApp. Home printing is not how this
- * works here.
+ * Saving is primary and printing secondary, because a tailor sends this to a
+ * print shop on WhatsApp. Home printing is not how this works here.
  */
 export default function BusinessCard() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frontRef = useRef<HTMLCanvasElement>(null);
+  const backRef = useRef<HTMLCanvasElement>(null);
 
   const [card, setCard] = useState<BusinessCardData | null>(null);
+  const [theme, setTheme] = useState<CardTheme>("light");
   const [loading, setLoading] = useState(true);
   const [problem, setProblem] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState<string | null>(null);
 
   useEffect(() => {
     void api
@@ -34,29 +34,29 @@ export default function BusinessCard() {
   }, []);
 
   const render = useCallback(async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !card) return;
+    if (!card) return;
 
     /*
      * The fonts have to be in before anything is measured, or the card is
-     * drawn in Times and then silently stays that way -- canvas takes no
-     * second pass when a font arrives late.
+     * drawn in Times and silently stays that way — canvas takes no second
+     * pass when a font arrives late.
      */
     try {
       await document.fonts.ready;
     } catch {
-      // No Font Loading API: it will fall back to the generic stack.
+      // No Font Loading API: it falls back to the generic stack.
     }
 
-    drawBusinessCard(canvas, card);
-  }, [card]);
+    if (frontRef.current) drawBusinessCard(frontRef.current, card, "front", theme);
+    if (backRef.current) drawBusinessCard(backRef.current, card, "back", theme);
+  }, [card, theme]);
 
   useEffect(() => {
     void render();
   }, [render]);
 
-  function save() {
-    const canvas = canvasRef.current;
+  function save(which: "front" | "back") {
+    const canvas = which === "front" ? frontRef.current : backRef.current;
     if (!canvas || !card) return;
 
     canvas.toBlob((blob) => {
@@ -68,14 +68,14 @@ export default function BusinessCard() {
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = `${card.slug}-card.png`;
+      link.download = `${card.slug}-card-${which}-${theme}.png`;
       document.body.appendChild(link);
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
 
-      setSaved(true);
-      window.setTimeout(() => setSaved(false), 3000);
+      setSaved(which);
+      window.setTimeout(() => setSaved(null), 3000);
     }, "image/png");
   }
 
@@ -97,31 +97,61 @@ export default function BusinessCard() {
       <div className="page-head">
         <h1>Your card</h1>
         <p>
-          Save it as a picture and send it to a printer. Anyone who scans the code lands on
-          your page, with your work on it.
+          Save both sides and send them to a printer. Anyone who scans the code lands on your
+          page, with your work on it.
         </p>
       </div>
 
       {problem ? <p className="notice bad">{problem}</p> : null}
 
-      <div className="card card-preview">
-        {/* The canvas is the card. Sized in lib/businessCard.ts. */}
-        <canvas ref={canvasRef} className="business-card" />
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-themes" role="radiogroup" aria-label="Card colour">
+          {(["light", "dark"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={theme === option}
+              className={`card-theme card-theme--${option}${theme === option ? " is-on" : ""}`}
+              onClick={() => setTheme(option)}
+            >
+              {option === "light" ? "White card" : "Dark card"}
+            </button>
+          ))}
+        </div>
+        <p className="hint">
+          Dark cards cost more to print, and the ink shows fingerprints. Both scan the same —
+          the code always stays black on white.
+        </p>
+      </div>
 
-        <div className="row-actions">
-          <button type="button" className="btn" onClick={save}>
-            Save card as picture
+      <div className="card-sides">
+        <div className="card card-preview">
+          <h2 style={{ fontSize: 16 }}>Front</h2>
+          <canvas ref={frontRef} className="business-card" />
+          <button type="button" className="btn" onClick={() => save("front")}>
+            Save the front
           </button>
-          <button type="button" className="btn quiet" onClick={() => window.print()}>
-            Print it
-          </button>
+          {saved === "front" ? <p className="notice">Saved. Look in your downloads.</p> : null}
         </div>
 
-        {saved ? <p className="notice">Saved. Look in your downloads.</p> : null}
+        <div className="card card-preview">
+          <h2 style={{ fontSize: 16 }}>Back</h2>
+          <canvas ref={backRef} className="business-card" />
+          <button type="button" className="btn" onClick={() => save("back")}>
+            Save the back
+          </button>
+          {saved === "back" ? <p className="notice">Saved. Look in your downloads.</p> : null}
+        </div>
+      </div>
 
+      <div className="card">
+        <button type="button" className="btn quiet" onClick={() => window.print()}>
+          Print both sides
+        </button>
         <p className="hint">
-          The address on your card is <strong>{card.url_label}</strong>. It never changes,
-          even if you rename your business — so cards already printed keep working.
+          The address on your card is <strong>{card.url_label}</strong>. It never changes, even
+          if you rename your business — so cards already printed keep working.
         </p>
       </div>
     </>
