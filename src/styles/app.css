@@ -2493,10 +2493,150 @@ a {
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
+  /*
+   * A confirmation panel is as tall as what it has to say, and the dispute
+   * one says a great deal: three outcomes, a split, a note and the resulting
+   * figures. `.lightbox-inner` caps it at the viewport, but a cap with no
+   * overflow simply hides the bottom -- which on a laptop meant the "Do it"
+   * button could not be reached at all. Measured at 1095px in a 695px
+   * window. The other panels sharing this class were one short screen away
+   * from the same thing.
+   */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 @media (max-width: 720px) {
   .people-filters {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Disputes
+   
+   Held money and two phone numbers. The card is bordered rather than tinted
+   all over: a customer opening her own order to find the whole page shouting
+   at her in red reads as blame, and she is the one who complained.
+   --------------------------------------------------------------------------- */
+
+.dispute {
+  border-left: 4px solid var(--line-strong);
+}
+
+.dispute--open {
+  border-left-color: var(--danger);
+}
+
+.dispute--resolved {
+  border-left-color: var(--success);
+}
+
+/* Somebody's own words, so they are set apart from ours. */
+.dispute__reason {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.dispute-list {
+  display: grid;
+  gap: 12px;
+}
+
+.dispute-row__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dispute-row__held {
+  display: grid;
+  justify-items: end;
+  text-align: right;
+}
+
+.dispute-row__held strong {
+  font-size: 20px;
+  color: var(--danger);
+}
+
+.dispute-row__calls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.dispute-party {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+/* The one thing on the card somebody actually acts on, so it is big enough
+   to hit with a thumb and reads as a number to dial rather than a label. */
+.dispute-party__phone {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--plum-deep);
+  text-decoration: none;
+  padding: 4px 0;
+}
+
+.dispute-party__phone:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   A list of choices you tap
+   
+   Radio buttons with their labels beside them are small targets and demand
+   that the label be read to know what the dot means. A whole card that
+   changes colour when it is chosen says the same thing at 48px.
+   --------------------------------------------------------------------------- */
+
+.choice-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.choice {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  text-align: left;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.choice:hover {
+  border-color: var(--line-strong);
+}
+
+.choice--on {
+  border-color: var(--plum);
+  background: var(--plum-tint);
+  box-shadow: inset 0 0 0 1px var(--plum);
+}
+
+[data-theme="dark"] .choice--on {
+  background: var(--surface-2);
 }

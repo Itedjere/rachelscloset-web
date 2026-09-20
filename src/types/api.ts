@@ -132,6 +132,7 @@ export interface Order {
   ready_at: string | null;
   collection_deadline: string | null;
   collected_at: string | null;
+  received_at: string | null;
   steps_total: number;
   steps_completed: number;
   steps_with_photo: number;
@@ -382,4 +383,44 @@ export interface PinResetIssue {
   whatsapp_url: string;
   expires_at: string;
   expires_in_hours: number;
+}
+
+/* ---- Disputes ------------------------------------------------------------ */
+
+export interface OrderDispute {
+  id: number;
+  status: "open" | "resolved";
+  reason: string;
+  raised_by: { id: number; name: string } | null;
+  /** Taken down over the phone by staff rather than tapped by her. */
+  opened_by_staff: boolean;
+  outcome: "refunded" | "released" | "withdrawn" | null;
+  refunded_amount: string | null;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  created_at: string;
+}
+
+/** A dispute as the admin queue shows it: both numbers, and what is held. */
+export interface AdminDispute extends OrderDispute {
+  order: {
+    id: number;
+    reference: string | null;
+    garment: string | null;
+    amount: string;
+    paid: string;
+    escrow: boolean;
+    collected_at: string | null;
+    received_at: string | null;
+    held: string;
+  } | null;
+  customer: DisputeParty | null;
+  tailor: DisputeParty | null;
+}
+
+export interface DisputeParty {
+  id: number;
+  name: string;
+  phone: string;
+  whatsapp: string;
 }

@@ -22,6 +22,7 @@ import Orders from "./pages/Orders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
+import Disputes from "./pages/admin/Disputes";
 import HeldReviews from "./pages/admin/HeldReviews";
 import People from "./pages/admin/People";
 import PinReset from "./pages/PinReset";
@@ -223,6 +224,14 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <People />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/disputes"
+          element={
+            <RoleRoute allow={["admin"]}>
+              <Disputes />
             </RoleRoute>
           }
         />

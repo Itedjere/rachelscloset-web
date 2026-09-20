@@ -4,6 +4,7 @@ import Avatar from "../components/Avatar";
 import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
 import OrderPhotos from "../components/OrderPhotos";
+import OrderDispute from "../components/OrderDispute";
 import OrderReviews from "../components/OrderReviews";
 import OrderTracker from "../components/OrderTracker";
 import { useAuth } from "../hooks/useAuth";
@@ -19,6 +20,7 @@ export default function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  const [disputed, setDisputed] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -35,12 +37,12 @@ export default function OrderDetail() {
     void load();
   }, [load]);
 
-  async function act(path: string) {
+  async function act(path: string, body?: unknown) {
     setBusy(true);
     setProblem(null);
 
     try {
-      const response = await api.post<ResourceResponse<Order>>(`/orders/${orderId}/${path}`);
+      const response = await api.post<ResourceResponse<Order>>(`/orders/${orderId}/${path}`, body);
       setOrder(response.data);
     } catch (error: unknown) {
       setProblem(errorMessage(error));
@@ -200,11 +202,58 @@ export default function OrderDetail() {
             </button>
           ) : null}
 
-          {order.status === "ready" ? (
-            <button type="button" className="btn" onClick={() => void act("collected")} disabled={busy}>
-              She has collected it
+        </div>
+      ) : null}
+
+      {/*
+        SHE SAYS WHICH, because the two are not the same event and the escrow
+        clock depends on the difference. A customer standing in the shop has
+        the garment the moment this is tapped; a customer four hundred
+        kilometres away has a tracking number and a week to wait. Two buttons
+        rather than a checkbox: a choice you make by reading a label and
+        ticking a box is the shape this platform avoids everywhere else.
+      */}
+      {isTailor && order.status === "ready" ? (
+        <div className="card">
+          <h2 style={{ fontSize: 18 }}>Has it gone?</h2>
+          <p className="hint">
+            If you posted it we wait for her to say it arrived before sending your money.
+          </p>
+          <div className="row-actions">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => void act("collected", { posted: false })}
+              disabled={busy}
+            >
+              She collected it from me
             </button>
-          ) : null}
+            <button
+              type="button"
+              className="btn quiet"
+              onClick={() => void act("collected", { posted: true })}
+              disabled={busy}
+            >
+              I sent it to her
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {/*
+        The other half of that: a parcel in the post has not arrived until she
+        says so, and nothing else on the platform can know when it did.
+      */}
+      {!isTailor && order.status === "collected" && !order.received_at ? (
+        <div className="card">
+          <h2 style={{ fontSize: 18 }}>Has it reached you?</h2>
+          <p className="hint">
+            Your tailor sent this one to you. Tell us when it arrives and we start counting
+            the few days before she is paid.
+          </p>
+          <button type="button" className="btn" onClick={() => void act("received")} disabled={busy}>
+            It arrived
+          </button>
         </div>
       ) : null}
 
@@ -213,7 +262,7 @@ export default function OrderDetail() {
         the person who paid says the garment is right there is nothing left to
         wait for.
       */}
-      {!isTailor && order.status === "collected" && order.escrow ? (
+      {!isTailor && order.status === "collected" && order.escrow && order.received_at && !disputed ? (
         <div className="card">
           <h2 style={{ fontSize: 18 }}>Is everything right?</h2>
           <p className="hint">
@@ -266,6 +315,15 @@ export default function OrderDetail() {
       {/* Her photographs of the finished garment, which become the tailor's
           gallery. Shown before the reviews: it is the nicer thing to do
           first, and it is the one that helps the tailor most. */}
+      {/* Both sides see this once it exists; only the customer can start it,
+          and only once the garment is in her hands. */}
+      <OrderDispute
+        orderId={order.id}
+        isTailor={isTailor}
+        onChanged={() => void load()}
+        onOpenChange={setDisputed}
+      />
+
       <OrderPhotos orderId={order.id} />
 
       {/* Once she has the garment in her hands, both sides can say so. */}
