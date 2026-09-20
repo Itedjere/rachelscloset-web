@@ -2099,3 +2099,65 @@ a {
 .setting input {
   max-width: 160px;
 }
+
+/* ---- The business card (Section 16) --------------------------------------
+
+   The canvas is drawn at print resolution (1004x650, which is 85x55mm at
+   300dpi) and scaled down here. What gets saved is the full-size file, which
+   is the point: it goes to a print shop, not to a screen.
+   --------------------------------------------------------------------------- */
+
+.business-card {
+  display: block;
+  width: 100%;
+  max-width: 502px;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  /* Always white, in both themes: it is a piece of paper, and showing it
+     tinted would misrepresent what the printer will produce. */
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/*
+   Printing is the secondary action, but it has to produce the card alone --
+   not the sidebar, the header and a page of chrome around it.
+*/
+@media print {
+  .app-header,
+  .sidebar,
+  .page-head,
+  .row-actions,
+  .hint,
+  .notice {
+    display: none !important;
+  }
+
+  .page,
+  .wrap,
+  .card,
+  .card-preview {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: #ffffff;
+  }
+
+  .business-card {
+    /* Actual size on paper, so it can be cut out. */
+    width: 85mm;
+    max-width: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}

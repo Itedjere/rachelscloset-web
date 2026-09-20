@@ -49,6 +49,11 @@ const GLYPHS: Record<string, Glyph> = {
   // A framed picture, for the gallery.
   image: { path: "M3 4h18v16H3zM3 16l5-5 4 4 3-3 6 6", circles: [[8.5, 8.5, 1.5]] },
 
+  // Three finder squares and a scatter: a QR code at icon size.
+  qr: {
+    path: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z",
+  },
+
   star: { path: "m12 2.6 2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 1.1-6.4L2.6 9.4l6.5-.9z" },
 
   trash: { path: "M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" },

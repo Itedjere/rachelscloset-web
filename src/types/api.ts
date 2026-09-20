@@ -277,3 +277,18 @@ export interface PlatformSettingRow {
   max: number;
   group: string;
 }
+
+/* ---- The business card (Section 16) -------------------------------------- */
+
+export interface BusinessCardData {
+  business_name: string;
+  name: string;
+  location: string;
+  whatsapp: string | null;
+  url: string;
+  /** Without the scheme: shorter on card, and nobody types it in. */
+  url_label: string;
+  slug: string;
+  /** One string of '0'/'1' per row. Drawn module by module on canvas. */
+  qr: string[];
+}

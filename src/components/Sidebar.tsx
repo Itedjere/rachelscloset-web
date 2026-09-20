@@ -35,6 +35,7 @@ const GROUPS: Group[] = [
       { to: "/orders", label: "Orders", icon: "check" },
       { to: "/garments", label: "Garments", icon: "garment" },
       { to: "/portfolio", label: "Your gallery", icon: "image", allow: ["tailor"] },
+      { to: "/card", label: "Your card", icon: "qr", allow: ["tailor"] },
     ],
   },
   {

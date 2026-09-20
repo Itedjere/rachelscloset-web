@@ -6,6 +6,7 @@ import AlertSettings from "./pages/AlertSettings";
 import Home from "./pages/Home";
 import Arrangement from "./pages/Arrangement";
 import BankAccount from "./pages/BankAccount";
+import BusinessCard from "./pages/BusinessCard";
 import Claim from "./pages/Claim";
 import Garments from "./pages/Garments";
 import MeasurementAccess from "./pages/MeasurementAccess";
@@ -152,6 +153,14 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <AdminOrderDetail />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/card"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <BusinessCard />
             </RoleRoute>
           }
         />
