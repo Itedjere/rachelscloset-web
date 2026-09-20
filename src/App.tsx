@@ -24,6 +24,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import HeldReviews from "./pages/admin/HeldReviews";
 import People from "./pages/admin/People";
+import PinReset from "./pages/PinReset";
 import Settings from "./pages/admin/Settings";
 import StepLibrary from "./pages/admin/StepLibrary";
 import Profile from "./pages/Profile";
@@ -43,6 +44,15 @@ export default function App() {
         */}
         <Route path="/claim" element={<Claim />} />
         <Route path="/claim/:token" element={<Claim />} />
+
+        {/*
+          Also outside ProtectedRoute: somebody who has forgotten her PIN
+          cannot sign in to reach a page behind sign-in. Both spellings,
+          because the link carries a token and the spoken code carries
+          nothing at all.
+        */}
+        <Route path="/reset" element={<PinReset />} />
+        <Route path="/reset/:token" element={<PinReset />} />
 
         <Route
           path="/"

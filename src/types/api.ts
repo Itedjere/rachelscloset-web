@@ -373,3 +373,13 @@ export interface AdminUser {
   slug: string | null;
   created_at: string;
 }
+
+/** An admin-issued way back in for somebody locked out. All channels free. */
+export interface PinResetIssue {
+  code: string;
+  link: string;
+  qr_svg: string;
+  whatsapp_url: string;
+  expires_at: string;
+  expires_in_hours: number;
+}

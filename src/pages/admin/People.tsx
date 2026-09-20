@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Avatar from "../../components/Avatar";
 import { api, errorMessage } from "../../lib/api";
-import type { AdminUser } from "../../types/api";
+import type { AdminUser, PinResetIssue } from "../../types/api";
 
 /**
  * People, and the one thing an admin can do to them.
@@ -21,6 +21,8 @@ export default function People() {
   const [busyId, setBusyId] = useState<number | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<AdminUser | null>(null);
+  const [resetFor, setResetFor] = useState<AdminUser | null>(null);
+  const [issued, setIssued] = useState<PinResetIssue | null>(null);
 
   const load = useCallback(async () => {
     setProblem(null);
@@ -43,6 +45,30 @@ export default function People() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  /**
+   * A way back in for somebody who has forgotten her PIN.
+   *
+   * Nothing is sent from here: the admin reads the six digits down the phone
+   * she is already holding, or taps through to her own WhatsApp. Every
+   * channel costs nothing per use, which is what stops recovery being the
+   * thing that gets switched off when money is tight.
+   */
+  async function issueReset(user: AdminUser) {
+    setBusyId(user.id);
+    setProblem(null);
+    setIssued(null);
+
+    try {
+      const response = await api.post<{ data: PinResetIssue }>(`/admin/users/${user.id}/pin-reset`);
+      setResetFor(user);
+      setIssued(response.data);
+    } catch (error: unknown) {
+      setProblem(errorMessage(error));
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function act(user: AdminUser, path: string, body?: unknown) {
     setBusyId(user.id);
@@ -129,6 +155,19 @@ export default function People() {
               </div>
 
               <div className="person__action">
+                {/* Only for an account that has actually been set up: one
+                    that never was needs an invitation, not a reset. */}
+                {user.claimed ? (
+                  <button
+                    type="button"
+                    className="btn quiet"
+                    onClick={() => void issueReset(user)}
+                    disabled={busyId === user.id}
+                  >
+                    Help her back in
+                  </button>
+                ) : null}
+
                 {user.role === "admin" ? (
                   <span className="pill">Admin</span>
                 ) : user.status === "suspended" ? (
@@ -155,6 +194,17 @@ export default function People() {
           ))}
         </div>
       )}
+
+      {issued && resetFor ? (
+        <ResetPanel
+          user={resetFor}
+          issued={issued}
+          onClose={() => {
+            setIssued(null);
+            setResetFor(null);
+          }}
+        />
+      ) : null}
 
       {/* Pausing somebody is not a one-tap action: it cuts her off mid-session,
           so it asks for a reason she will actually be shown. */}
@@ -225,6 +275,69 @@ function PauseDialog({
           </button>
           <button type="button" className="btn quiet" onClick={onCancel} disabled={busy}>
             Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The three free channels, side by side.
+ *
+ * Nothing is sent from this panel. The admin reads the digits aloud on the
+ * call she is already on, taps through to her own WhatsApp, or holds the
+ * screen up if they happen to be in the same room. No SMS, no WhatsApp
+ * Business API, no per-use cost at all — which is the reason this recovery
+ * route can be relied on to still exist in a year.
+ */
+function ResetPanel({
+  user,
+  issued,
+  onClose,
+}: {
+  user: AdminUser;
+  issued: PinResetIssue;
+  onClose: () => void;
+}) {
+  return (
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label="A way back in">
+      <div className="lightbox-inner confirm-panel" onClick={(event) => event.stopPropagation()}>
+        <h2 style={{ fontSize: 18 }}>A way back in for {user.name}</h2>
+        <p className="hint">
+          Give her any one of these. It works once, and stops working in{" "}
+          {issued.expires_in_hours} hours.
+        </p>
+
+        <div className="invite-channels">
+          <div className="invite-qr">
+            {/* From our own API, built from a link we generated. */}
+            <div
+              className="invite-qr-image"
+              dangerouslySetInnerHTML={{ __html: issued.qr_svg }}
+            />
+            <p className="hint">If she is with you, let her scan this.</p>
+          </div>
+
+          <div className="invite-rest">
+            <a className="btn" href={issued.whatsapp_url} target="_blank" rel="noreferrer noopener">
+              Send it on WhatsApp
+            </a>
+
+            <div className="invite-code">
+              <span className="hint">Or read her these numbers:</span>
+              <strong>{issued.code}</strong>
+            </div>
+
+            <p className="hint">
+              She will be asked for her phone number too, so the numbers only work for her.
+            </p>
+          </div>
+        </div>
+
+        <div className="row-actions">
+          <button type="button" className="btn quiet" onClick={onClose}>
+            Done
           </button>
         </div>
       </div>
