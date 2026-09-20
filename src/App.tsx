@@ -17,6 +17,7 @@ import OrderPaid from "./pages/OrderPaid";
 import Orders from "./pages/Orders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminOrders from "./pages/admin/AdminOrders";
+import HeldReviews from "./pages/admin/HeldReviews";
 import StepLibrary from "./pages/admin/StepLibrary";
 import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
@@ -149,6 +150,14 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <AdminOrderDetail />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/reviews"
+          element={
+            <RoleRoute allow={["admin"]}>
+              <HeldReviews />
             </RoleRoute>
           }
         />

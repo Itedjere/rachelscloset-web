@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
+import OrderReviews from "../components/OrderReviews";
 import OrderTracker from "../components/OrderTracker";
 import { useAuth } from "../hooks/useAuth";
 import { api, errorMessage } from "../lib/api";
@@ -260,6 +261,9 @@ export default function OrderDetail() {
           ) : null}
         </div>
       ) : null}
+
+      {/* Once she has the garment in her hands, both sides can say so. */}
+      <OrderReviews orderId={order.id} />
 
       {order.status === "pending_payment" ? (
         <div className="row-actions">

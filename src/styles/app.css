@@ -193,14 +193,28 @@ a {
   margin-bottom: 16px;
 }
 
-.field label {
+/*
+ * Two markups, both supported: a <div class="field"> wrapping its own
+ * <label>, and a <label class="field"> whose text is in a <span>. The second
+ * associates the label with its control without an id, and is what the newer
+ * pages use.
+ */
+.field label,
+.field > span {
   display: block;
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
 }
 
-.field input {
+/*
+ * textarea and select belong here too. Without them a textarea rendered
+ * inline and unthemed -- a small white box beside its label -- because it
+ * was the full-width input that had been making this layout work at all.
+ */
+.field input,
+.field textarea,
+.field select {
   width: 100%;
   min-height: 48px;
   padding: 10px 14px;
@@ -211,12 +225,21 @@ a {
   font: inherit;
 }
 
-.field input:focus-visible {
+.field textarea {
+  min-height: 0;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
   outline: 2px solid var(--plum);
   outline-offset: 1px;
 }
 
-.field input[aria-invalid="true"] {
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
   border-color: var(--danger);
 }
 
@@ -1835,4 +1858,110 @@ a {
 .consent .notice {
   flex: 1 1 100%;
   margin: 0;
+}
+
+/* ---- Reviews (Section 13) -------------------------------------------------
+
+   Five shapes you touch, because the whole platform is built for people who
+   find reading hard and a star rating is the one control that needs no words.
+   The tappable stars are 34px each inside a 44px target, not the 20px a
+   desktop design would reach for.
+   --------------------------------------------------------------------------- */
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--gold);
+  line-height: 0;
+}
+
+.star {
+  color: var(--line-strong);
+}
+
+.star.on {
+  color: var(--gold);
+}
+
+.stars-input {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.stars-input button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--line-strong);
+  border-radius: 8px;
+}
+
+.stars-input button:hover .star,
+.stars-input button:focus-visible .star {
+  color: var(--gold-soft);
+}
+
+.stars-input button:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 2px;
+}
+
+.review {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.review:first-of-type {
+  border-top: 0;
+}
+
+.review-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.review-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.review-body p {
+  margin: 6px 0 0;
+}
+
+.review-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- The held queue ------------------------------------------------------- */
+
+.held-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.held-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.held .facts {
+  margin: 12px 0;
 }

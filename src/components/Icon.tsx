@@ -46,6 +46,8 @@ const GLYPHS: Record<string, Glyph> = {
   // A padlock, for consent.
   lock: { path: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4" },
 
+  star: { path: "m12 2.6 2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 1.1-6.4L2.6 9.4l6.5-.9z" },
+
   trash: { path: "M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" },
   menu: { path: "M3 6h18M3 12h18M3 18h18" },
   close: { path: "M18 6 6 18M6 6l12 12" },

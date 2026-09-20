@@ -217,3 +217,37 @@ export interface ClaimPreview {
   invited_by: string | null;
   invited_by_business: string | null;
 }
+
+/* ---- Reviews (Section 13) ------------------------------------------------ */
+
+export type ReviewDirection = "customer_to_tailor" | "tailor_to_customer";
+
+export interface OrderReview {
+  id: number;
+  direction: ReviewDirection;
+  rating: number;
+  body: string | null;
+  /** "held" is only ever returned to the person who wrote it. */
+  status: "published" | "held";
+  author: { id: number | null; name: string | null; avatar_url: string | null };
+  published_at: string | null;
+  created_at: string;
+}
+
+/** A review the proof gate is holding, as the admin queue shows it. */
+export interface HeldReview {
+  id: number;
+  rating: number;
+  body: string | null;
+  author: { id: number; name: string } | null;
+  subject: { id: number; name: string } | null;
+  order: {
+    id: number;
+    reference: string | null;
+    garment: string | null;
+    steps_completed: number | null;
+    steps_with_photo: number | null;
+  };
+  proof_ratio: string | null;
+  created_at: string;
+}
