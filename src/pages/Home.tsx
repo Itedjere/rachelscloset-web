@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import ListingBanner from "../components/ListingBanner";
 import { useAuth } from "../hooks/useAuth";
@@ -18,6 +18,14 @@ export default function Home() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const isTailor = user?.role === "tailor";
+
+  /*
+   * An admin's dashboard is a different page with a different job — what is
+   * waiting and what has stopped running, rather than a menu. One entry
+   * point still, so a notification tapped on a lock screen lands somewhere
+   * sensible whoever opens it.
+   */
+  if (isAdmin) return <Navigate to="/admin" replace />;
 
   return (
     <>

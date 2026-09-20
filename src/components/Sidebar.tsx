@@ -42,7 +42,9 @@ const GROUPS: Group[] = [
   {
     heading: "Administration",
     items: [
+      { to: "/admin", label: "Overview", icon: "home", allow: ["admin"], end: true },
       { to: "/admin/orders", label: "All orders", icon: "list", allow: ["admin"] },
+      { to: "/admin/people", label: "People", icon: "user", allow: ["admin"] },
       { to: "/admin/reviews", label: "Reviews to check", icon: "star", allow: ["admin"] },
       { to: "/admin/steps", label: "Step library", icon: "list", allow: ["admin"] },
       { to: "/admin/settings", label: "Settings", icon: "cog", allow: ["admin"] },

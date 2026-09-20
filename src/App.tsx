@@ -20,8 +20,10 @@ import Subscription from "./pages/Subscription";
 import SubscriptionPaid from "./pages/SubscriptionPaid";
 import Orders from "./pages/Orders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import HeldReviews from "./pages/admin/HeldReviews";
+import People from "./pages/admin/People";
 import Settings from "./pages/admin/Settings";
 import StepLibrary from "./pages/admin/StepLibrary";
 import Profile from "./pages/Profile";
@@ -195,6 +197,22 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <Settings />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RoleRoute allow={["admin"]}>
+              <AdminDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/people"
+          element={
+            <RoleRoute allow={["admin"]}>
+              <People />
             </RoleRoute>
           }
         />

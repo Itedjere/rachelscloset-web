@@ -2325,3 +2325,178 @@ a {
 .term:first-child {
   border-top: 0;
 }
+
+/* ---- The admin dashboard (Section 17) ------------------------------------
+
+   Two questions, in order: is anything waiting, and is anything quietly
+   broken. Numbers last, because a figure nobody acts on is decoration.
+   --------------------------------------------------------------------------- */
+
+.attention {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.attention li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.attention li:first-child {
+  border-top: 0;
+}
+
+.attention li a {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.attention__count {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Money that did not move, and somebody probing the webhook: the two things
+   here that are actually wrong rather than merely waiting. */
+.attention li.is-bad .attention__count {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+/* ---- Is it still running? ------------------------------------------------- */
+
+.health {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.health li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-left: 3px solid transparent;
+  padding-left: 12px;
+}
+
+.health li:first-child {
+  border-top: 0;
+}
+
+.health li > div {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.health__when {
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/*
+ * Qualified with `li`, or `.health li` above wins on specificity (0-1-1
+ * against 0-1-0) and its shorthand's `transparent` silently eats the colour
+ * -- which is the entire point of the panel.
+ */
+.health li.health--ok {
+  border-left-color: var(--success);
+}
+
+/* Never run is normal on a machine just set up; stale is not. */
+.health li.health--never {
+  border-left-color: var(--line-strong);
+}
+
+.health li.health--stale {
+  border-left-color: var(--danger);
+}
+
+.health--stale .health__when {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* ---- Numbers -------------------------------------------------------------- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-card__value {
+  font-family: var(--font-display, inherit);
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- People --------------------------------------------------------------- */
+
+.people-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+
+.people-filters .field {
+  margin-bottom: 0;
+}
+
+.people-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.person__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.person__action {
+  flex: none;
+  margin-left: auto;
+}
+
+.confirm-panel {
+  max-width: 440px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+@media (max-width: 720px) {
+  .people-filters {
+    grid-template-columns: 1fr;
+  }
+}

@@ -325,3 +325,51 @@ export interface SubscriptionState {
   grace_days: number;
   terms: SubscriptionTermRow[];
 }
+
+/* ---- The admin dashboard (Section 17) ------------------------------------ */
+
+export interface AttentionItem {
+  key: string;
+  count: number;
+  label: string;
+  /** Null when there is nowhere useful to send somebody. */
+  href: string | null;
+  tone: "normal" | "bad";
+}
+
+/** Whether a scheduled command is still running. None is load-bearing. */
+export interface HealthRow {
+  key: string;
+  label: string;
+  note: string;
+  last_run_at: string | null;
+  state: "ok" | "stale" | "never";
+}
+
+export interface AdminDashboardData {
+  attention: AttentionItem[];
+  health: HealthRow[];
+  numbers: {
+    orders_in_progress: number;
+    orders_this_month: number;
+    tailors: number;
+    tailors_listed: number;
+    customers: number;
+    subscription_income_this_month: string;
+    held_in_escrow: string;
+  };
+}
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  phone: string;
+  role: Role;
+  status: "active" | "suspended";
+  suspended_until: string | null;
+  claimed: boolean;
+  avatar_url: string | null;
+  business_name: string | null;
+  slug: string | null;
+  created_at: string;
+}
