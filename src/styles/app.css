@@ -1965,3 +1965,137 @@ a {
 .held .facts {
   margin: 12px 0;
 }
+
+/* A small label: who a thing came from, or why it is the way it is.
+   Used here and on the consent screen from Section 11, where it had been
+   referenced without ever being defined. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A customer's photograph, which is the kind worth drawing the eye to. */
+.pill.gold {
+  border-color: var(--gold-soft);
+  background: var(--gold-tint);
+  color: var(--gold);
+}
+
+/* ---- The gallery, as the tailor manages it (Section 15) ------------------- */
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.portfolio-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* A hidden photograph still shows here -- she needs to find it to put it
+   back -- but it must not look like it is on her page. */
+.portfolio-item.is-hidden {
+  opacity: 0.55;
+}
+
+.portfolio-item.is-hidden img {
+  filter: grayscale(1);
+}
+
+.portfolio-item img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.portfolio-item figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.portfolio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.portfolio-actions .btn {
+  padding: 6px 10px;
+  min-height: 36px;
+}
+
+/* ---- The customer's photographs on an order ------------------------------ */
+
+.worn-photo {
+  position: relative;
+  flex: none;
+}
+
+.worn-photo img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+.worn-photo__remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.worn-photo__remove:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---- Settings ------------------------------------------------------------- */
+
+.setting {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.setting:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.setting input {
+  max-width: 160px;
+}

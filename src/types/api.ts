@@ -251,3 +251,29 @@ export interface HeldReview {
   proof_ratio: string | null;
   created_at: string;
 }
+
+/* ---- Portfolio and settings (Section 15) -------------------------------- */
+
+/** One photograph in a tailor's public gallery. `url` is a public URL. */
+export interface PortfolioPhoto {
+  id: number;
+  url: string;
+  caption: string | null;
+  position: number;
+  hidden: boolean;
+  /** True when the tailor uploaded it herself, false when a customer did. */
+  mine: boolean;
+  uploaded_by: { id: number; name: string } | null;
+  order: { id: number; reference: string | null; garment: string | null } | null;
+  created_at: string;
+}
+
+export interface PlatformSettingRow {
+  key: string;
+  value: string;
+  label: string;
+  help: string;
+  min: number;
+  max: number;
+  group: string;
+}

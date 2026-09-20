@@ -14,10 +14,12 @@ import Notifications from "./pages/Notifications";
 import OrderDetail from "./pages/OrderDetail";
 import OrderNew from "./pages/OrderNew";
 import OrderPaid from "./pages/OrderPaid";
+import Portfolio from "./pages/Portfolio";
 import Orders from "./pages/Orders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminOrders from "./pages/admin/AdminOrders";
 import HeldReviews from "./pages/admin/HeldReviews";
+import Settings from "./pages/admin/Settings";
 import StepLibrary from "./pages/admin/StepLibrary";
 import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
@@ -150,6 +152,22 @@ export default function App() {
           element={
             <RoleRoute allow={["admin"]}>
               <AdminOrderDetail />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/portfolio"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <Portfolio />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <RoleRoute allow={["admin"]}>
+              <Settings />
             </RoleRoute>
           }
         />

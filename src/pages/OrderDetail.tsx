@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
+import OrderPhotos from "../components/OrderPhotos";
 import OrderReviews from "../components/OrderReviews";
 import OrderTracker from "../components/OrderTracker";
 import { useAuth } from "../hooks/useAuth";
@@ -261,6 +262,11 @@ export default function OrderDetail() {
           ) : null}
         </div>
       ) : null}
+
+      {/* Her photographs of the finished garment, which become the tailor's
+          gallery. Shown before the reviews: it is the nicer thing to do
+          first, and it is the one that helps the tailor most. */}
+      <OrderPhotos orderId={order.id} />
 
       {/* Once she has the garment in her hands, both sides can say so. */}
       <OrderReviews orderId={order.id} />
