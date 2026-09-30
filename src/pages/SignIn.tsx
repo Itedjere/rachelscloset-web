@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import PinInput from "../components/PinInput";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError, errorMessage } from "../lib/api";
@@ -93,6 +93,17 @@ export default function SignIn() {
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form>
+
+      {/*
+        The door for a spoken claim code. Before this, nothing anywhere linked
+        to /claim, so somebody holding six digits from her tailor had nowhere
+        to type them. Sign-in is where she lands when she does not know where
+        else to go, and a button rather than a line of small print, because it
+        is a whole way in, not a footnote.
+      */}
+      <Link className="btn quiet block" to="/claim" style={{ marginTop: 12 }}>
+        My tailor read me six numbers
+      </Link>
     </div>
   );
 }

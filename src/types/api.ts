@@ -209,6 +209,8 @@ export interface MeasurementAccessRow {
 
 export interface ClaimInvite {
   code: string;
+  /** Where a spoken code is typed in, e.g. https://…/claim. */
+  claim_page: string;
   link: string;
   qr_svg: string;
   whatsapp_url: string;

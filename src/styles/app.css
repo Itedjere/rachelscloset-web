@@ -1853,12 +1853,21 @@ a {
   gap: 12px;
 }
 
-.invite-code strong {
+/* The code itself: a direct child, so the address inside the spoken
+   sentence below does not also come out 30px and letter-spaced. */
+.invite-code > strong {
   display: block;
   font-size: 30px;
   letter-spacing: 0.14em;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
+}
+
+/* What to say down the phone, word for word. */
+.invite-script {
+  margin: 4px 0 6px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 /* ---- Consent -------------------------------------------------------------- */

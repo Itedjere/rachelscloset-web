@@ -78,10 +78,23 @@ export default function ClaimInvite({
               Send it on WhatsApp
             </a>
 
-            {/* 3. For when they are not together. */}
+            {/*
+              3. For when they are not together. The whole sentence to say,
+              not just the digits: six numbers with no address beside them
+              were a key with no door, and a tailor should not have to
+              compose the instructions herself while on the phone. The
+              address is shown without "https://", which nobody says aloud.
+            */}
             <div className="invite-code">
-              <span className="hint">Or read her this number, with her phone number:</span>
+              <span className="hint">Not together? Ring her and say:</span>
+              <p className="invite-script">
+                “Go to <strong>{invite.claim_page.replace(/^https?:\/\//, "")}</strong>. Type
+                your phone number, then these six numbers:”
+              </p>
               <strong>{invite.code}</strong>
+              <span className="hint">
+                She can also tap “My tailor read me six numbers” on the sign-in page.
+              </span>
             </div>
 
             <button type="button" className="btn quiet" onClick={() => void issue()} disabled={busy}>
