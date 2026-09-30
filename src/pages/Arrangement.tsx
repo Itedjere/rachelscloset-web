@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import AudioPlayer from "../components/AudioPlayer";
 import { useAttachment } from "../hooks/useAttachment";
 import { useAuth } from "../hooks/useAuth";
+import { useReorder } from "../hooks/useReorder";
 import { api, errorMessage } from "../lib/api";
 import type { Arrangement, ArrangedStep, GarmentType, LibraryStep, ResourceResponse } from "../types/api";
 
@@ -13,19 +14,26 @@ import type { Arrangement, ArrangedStep, GarmentType, LibraryStep, ResourceRespo
  * Same screen, because it is the same operation — the server decides whose
  * arrangement a request may write, so there is nothing here to get wrong.
  *
- * NO DRAG AND DROP. Up and down arrows, deliberately:
+ * DRAGGING AND ARROWS, not one or the other. CLAUDE.md §3 ruled drag and
+ * drop out, and the reasoning stands on its own terms — but it argues
+ * against drag being the ONLY way to reorder, not against it existing:
  *
- *   - Touch DnD fights page scroll. Nine steps do not fit on a 5-inch screen,
- *     so reordering means dragging *while* scrolling, which is the most
- *     fragile part of every DnD library on cheap Android with an old Chrome.
+ *   - Touch DnD fights page scroll. Here a drag can only start on the grip,
+ *     which is the one element with `touch-action: none`; the rest of the
+ *     row scrolls the page exactly as before. Dragging near an edge scrolls
+ *     the page, so nine stages on a 5-inch screen still work.
  *   - "Press and hold, then move" has no affordance a non-reader can decode.
- *     Arrows beside a numbered list are a picture of what will happen.
- *   - The arrows have to exist anyway for keyboard use, so DnD would mean two
- *     code paths mutating the same order.
+ *     So the arrows stay, unchanged, beside a numbered list — and they are
+ *     also the keyboard route, which a pointer gesture can never be.
+ *   - Two code paths mutating the same order: both call `commit`, which PUTs
+ *     the whole array. There is one mutation, reached two ways.
  *
- * The interaction that actually matters is the play button on every row, so a
- * tailor can arrange the list by listening rather than reading.
+ * The interaction that actually matters is still the play button on every
+ * row, so a tailor can arrange the list by listening rather than reading.
  */
+/* A stable reference: a fresh [] each render would resync the hook forever. */
+const EMPTY: ArrangedStep[] = [];
+
 export default function ArrangementPage() {
   const { garmentTypeId } = useParams();
   const { user } = useAuth();
@@ -84,6 +92,18 @@ export default function ArrangementPage() {
       setSaving(false);
     }
   }
+
+  /*
+   * Fed by the same `commit` the arrows call, so dropping a row and tapping
+   * an arrow are the same request. The hook owns the order only while a
+   * finger is down; the rest of the time the server's answer is the truth.
+   */
+  const steps = arrangement?.steps ?? EMPTY;
+  const { order, draggingId, listRef, gripProps, rowStyle } = useReorder({
+    items: steps,
+    onCommit: (next) => void commit(next),
+    disabled: saving,
+  });
 
   function move(index: number, by: -1 | 1) {
     if (!arrangement) return;
@@ -150,14 +170,20 @@ export default function ArrangementPage() {
       {arrangement.steps.length === 0 ? (
         <p className="empty">No steps yet. Add some from the list below.</p>
       ) : (
-        <ol className="arrangement">
-          {arrangement.steps.map((step, index) => (
+        <ol
+          className={`arrangement${draggingId !== null ? " is-reordering" : ""}`}
+          ref={listRef as React.RefObject<HTMLOListElement>}
+        >
+          {order.map((step, index) => (
             <StepCard
               key={step.id}
               step={step}
               index={index}
-              count={arrangement.steps.length}
+              count={order.length}
               busy={saving}
+              dragging={draggingId === step.id}
+              grip={gripProps(step.id)}
+              style={rowStyle(step.id)}
               onUp={() => move(index, -1)}
               onDown={() => move(index, 1)}
               onRemove={() => remove(step.id)}
@@ -197,6 +223,9 @@ function StepCard({
   index,
   count,
   busy,
+  dragging,
+  grip,
+  style,
   onUp,
   onDown,
   onRemove,
@@ -205,6 +234,9 @@ function StepCard({
   index: number;
   count: number;
   busy: boolean;
+  dragging: boolean;
+  grip: React.HTMLAttributes<HTMLElement>;
+  style?: React.CSSProperties;
   onUp: () => void;
   onDown: () => void;
   onRemove: () => void;
@@ -212,7 +244,18 @@ function StepCard({
   const { objectUrl } = useAttachment(step.voice_note_url);
 
   return (
-    <li className="arrangement__step">
+    <li className={`arrangement__step${dragging ? " is-dragging" : ""}`} style={style}>
+      {/*
+        The only element that starts a drag, and the only one with
+        `touch-action: none`. Everywhere else on this row a finger still
+        scrolls the page, which is the whole reason dragging can be here at
+        all. `aria-hidden` because the arrows below already say this in a
+        way a screen reader and a keyboard can both use.
+      */}
+      <span className="arrangement__grip" aria-hidden="true" {...grip}>
+        ⠿
+      </span>
+
       <span className="arrangement__number" aria-hidden="true">
         {index + 1}
       </span>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useReorder } from "../hooks/useReorder";
 import { api, errorMessage } from "../lib/api";
 import type { GarmentType, ResourceResponse } from "../types/api";
 
@@ -35,21 +36,16 @@ export default function Garments() {
     void load();
   }, [load]);
 
-  // Same whole-array reorder as the steps within an arrangement.
-  async function move(index: number, by: -1 | 1) {
-    const next = [...types];
-    const target = index + by;
-    if (target < 0 || target >= next.length) return;
-
-    const a = next[index];
-    const b = next[target];
-    if (!a || !b) return;
-
-    next[index] = b;
-    next[target] = a;
+  /*
+   * The whole ordered array, PUT -- the same shape as the stages within a
+   * garment, and the same reason: a move is one idempotent request with no
+   * gap arithmetic, so a retry on a bad connection cannot corrupt the order.
+   * The grip and the arrows both end up here.
+   */
+  async function commit(next: GarmentType[]) {
     setTypes(next);
-
     setBusy(true);
+
     try {
       const response = await api.put<ResourceResponse<GarmentType[]>>("/admin/garment-types/reorder", {
         ids: next.map((t) => t.id),
@@ -77,6 +73,34 @@ export default function Garments() {
     } finally {
       setBusy(false);
     }
+  }
+
+  /*
+   * Dragging, for admins only -- nobody else may reorder this list, so a
+   * grip on a tailor's screen would be a control that silently does
+   * nothing. The arrows stay for everyone who has them.
+   */
+  const { order, draggingId, listRef, gripProps, rowStyle } = useReorder({
+    items: types,
+    onCommit: (next) => void commit(next),
+    disabled: busy || !isAdmin,
+  });
+
+  function move(index: number, by: -1 | 1) {
+    const next = [...types];
+    const target = index + by;
+
+    if (target < 0 || target >= next.length) return;
+
+    const a = next[index];
+    const b = next[target];
+
+    if (!a || !b) return;
+
+    next[index] = b;
+    next[target] = a;
+
+    void commit(next);
   }
 
   return (
@@ -107,9 +131,24 @@ export default function Garments() {
       {loading ? (
         <p className="empty">Loading…</p>
       ) : (
-        <ol className="arrangement">
-          {types.map((type, index) => (
-            <li className="arrangement__step" key={type.id}>
+        <ol
+          className={`arrangement${draggingId !== null ? " is-reordering" : ""}`}
+          ref={listRef as React.RefObject<HTMLOListElement>}
+        >
+          {order.map((type, index) => (
+            <li
+              className={`arrangement__step${draggingId === type.id ? " is-dragging" : ""}`}
+              key={type.id}
+              style={rowStyle(type.id)}
+            >
+              {/* The one element that starts a drag, and the only one that
+                  takes the touch away from the page. */}
+              {isAdmin ? (
+                <span className="arrangement__grip" aria-hidden="true" {...gripProps(type.id)}>
+                  ⠿
+                </span>
+              ) : null}
+
               <span className="arrangement__number" aria-hidden="true">
                 {index + 1}
               </span>
@@ -139,7 +178,7 @@ export default function Garments() {
                       type="button"
                       className="icon-btn"
                       onClick={() => void move(index, 1)}
-                      disabled={busy || index === types.length - 1}
+                      disabled={busy || index === order.length - 1}
                       aria-label={`Move ${type.name} down`}
                     >
                       ↓

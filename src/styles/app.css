@@ -3080,3 +3080,71 @@ a {
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Dragging a stage into place
+
+   Beside the arrows, never instead of them. CLAUDE.md §3 ruled drag out
+   because touch DnD fights scroll and a hidden long-press has no affordance;
+   both are answered by making the grip the only thing that starts a drag and
+   the only thing that takes the touch away from the page.
+   --------------------------------------------------------------------------- */
+
+.arrangement__grip {
+  display: grid;
+  place-items: center;
+  /* 44px: the same fingertip minimum as every other control here. */
+  width: 32px;
+  min-height: 44px;
+  align-self: stretch;
+  flex: none;
+  margin-left: -4px;
+  color: var(--ink-mute);
+  font-size: 18px;
+  line-height: 1;
+  cursor: grab;
+  /*
+   * THE ONLY PLACE THIS APPEARS. It hands the vertical gesture to us, so a
+   * finger here drags instead of scrolling. On the label, the play button or
+   * the arrows the page still scrolls exactly as it did before.
+   */
+  touch-action: none;
+  user-select: none;
+}
+
+.arrangement__grip:hover {
+  color: var(--ink);
+}
+
+.arrangement__step.is-dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow);
+  border-color: var(--plum);
+  /* Lifted off the list rather than merely tinted: the row is somewhere it
+     does not belong yet, and it should look like it. */
+  background: var(--surface);
+  opacity: 0.97;
+}
+
+.arrangement__step.is-dragging .arrangement__grip {
+  cursor: grabbing;
+  color: var(--plum);
+}
+
+/*
+ * The rows that are shuffling out of the way slide; the one under the finger
+ * must not, or it lags behind the hand by exactly the transition duration.
+ */
+.arrangement.is-reordering .arrangement__step {
+  transition: transform 160ms var(--ease-out, ease-out);
+}
+
+.arrangement.is-reordering .arrangement__step.is-dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrangement.is-reordering .arrangement__step {
+    transition: none;
+  }
+}
