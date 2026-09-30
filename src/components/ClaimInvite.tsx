@@ -19,8 +19,11 @@ import type { ClaimInvite as Invite } from "../types/api";
  */
 export default function ClaimInvite({
   customer,
+  why = "Until she does, she cannot see these measurements and no other tailor can either.",
 }: {
   customer: { id: number; name: string };
+  /** What she is missing without an account, in terms of the page it sits on. */
+  why?: string;
 }) {
   const [invite, setInvite] = useState<Invite | null>(null);
   const [busy, setBusy] = useState(false);
@@ -43,10 +46,7 @@ export default function ClaimInvite({
   return (
     <div className="card invite" style={{ marginBottom: 16 }}>
       <h2 style={{ fontSize: 18 }}>{customer.name} has not set up her account yet</h2>
-      <p className="hint">
-        Until she does, she cannot see these measurements and no other tailor can either.
-        Give her one of these three.
-      </p>
+      <p className="hint">{why} Give her one of these three.</p>
 
       {problem ? <p className="notice bad">{problem}</p> : null}
 

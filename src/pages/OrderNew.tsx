@@ -21,6 +21,11 @@ export default function OrderNew() {
   const [looking, setLooking] = useState(false);
   const [lookupProblem, setLookupProblem] = useState<string | null>(null);
 
+  // The number matched nobody, so the next thing on screen is "add her".
+  const [notFound, setNotFound] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [adding, setAdding] = useState(false);
+
   const [garments, setGarments] = useState<GarmentType[]>([]);
   const [garmentTypeId, setGarmentTypeId] = useState<string>("");
   const [description, setDescription] = useState("");
@@ -44,6 +49,7 @@ export default function OrderNew() {
     event.preventDefault();
     setLooking(true);
     setLookupProblem(null);
+    setNotFound(false);
     setCustomer(null);
 
     try {
@@ -52,9 +58,39 @@ export default function OrderNew() {
       );
       setCustomer(response.data);
     } catch (error: unknown) {
-      setLookupProblem(errorMessage(error));
+      if (error instanceof ApiError && error.status === 404) {
+        setNotFound(true);
+      } else {
+        setLookupProblem(errorMessage(error));
+      }
     } finally {
       setLooking(false);
+    }
+  }
+
+  /*
+   * Adding her from the shop floor: a name and the number already typed,
+   * nothing else. No PIN -- she chooses her own when she claims it, which the
+   * order page offers next. If the number turns out to be somebody already
+   * here, the server hands that customer back instead of making a second.
+   */
+  async function addCustomer(event: React.FormEvent) {
+    event.preventDefault();
+    setAdding(true);
+    setLookupProblem(null);
+
+    try {
+      const response = await api.post<ResourceResponse<FoundCustomer>>("/customers", {
+        name: newName,
+        phone,
+      });
+      setCustomer(response.data);
+      setNotFound(false);
+      setNewName("");
+    } catch (error: unknown) {
+      setLookupProblem(errorMessage(error));
+    } finally {
+      setAdding(false);
     }
   }
 
@@ -103,7 +139,12 @@ export default function OrderNew() {
             type="tel"
             inputMode="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              // "Add her" belongs to the number that was looked up, not
+              // whatever the box says after she corrects a digit.
+              setNotFound(false);
+            }}
             placeholder="0803 000 0003"
           />
         </div>
@@ -114,8 +155,7 @@ export default function OrderNew() {
 
         {lookupProblem ? (
           <p className="notice bad" style={{ marginTop: 12, marginBottom: 0 }}>
-            {lookupProblem} Creating a customer from the shop floor comes with the measurements
-            section.
+            {lookupProblem}
           </p>
         ) : null}
 
@@ -126,10 +166,42 @@ export default function OrderNew() {
               <strong>{customer.name}</strong>
               <div className="hint">{customer.phone}</div>
             </div>
-            {!customer.claimed ? <span className="status-pill">Not claimed yet</span> : null}
+            {!customer.claimed ? <span className="status-pill">No account yet</span> : null}
           </div>
         ) : null}
+
+        {/* Said before the order is written, not after: she will need an
+            account to pay, so the tailor should know the next step exists. */}
+        {customer && !customer.claimed ? (
+          <p className="hint" style={{ marginTop: 12, marginBottom: 0 }}>
+            She needs her own account to pay and to watch the work. Once this order is open, you
+            can set it up for her on its page.
+          </p>
+        ) : null}
       </form>
+
+      {notFound && !customer ? (
+        <form className="card" onSubmit={addCustomer} style={{ marginBottom: 16 }}>
+          <h2 style={{ fontSize: 18 }}>Nobody has that number yet</h2>
+          <p className="hint">Add her now. She sets her own PIN later, from her phone.</p>
+
+          <div className="field">
+            <label htmlFor="new-name">Her name</label>
+            <input
+              id="new-name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Amaka Obi"
+              autoComplete="off"
+              autoFocus
+            />
+          </div>
+
+          <button type="submit" className="btn" disabled={adding || newName.trim() === ""}>
+            {adding ? "Adding…" : `Add her with ${phone.trim()}`}
+          </button>
+        </form>
+      ) : null}
 
       {customer ? (
         <form className="card" onSubmit={submit}>

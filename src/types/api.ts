@@ -90,6 +90,8 @@ export interface OrderParty {
   id: number;
   name: string;
   phone: string;
+  /** False for a customer added from the shop floor who has not set a PIN yet. */
+  claimed: boolean;
   avatar_url: string | null;
 }
 

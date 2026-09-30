@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
+import ClaimInvite from "../components/ClaimInvite";
 import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
 import OrderPhotos from "../components/OrderPhotos";
@@ -115,6 +116,19 @@ export default function OrderDetail() {
           </Link>
         ) : null}
       </div>
+
+      {/*
+        A customer added from the shop floor cannot sign in, so she cannot pay
+        and the tracker she is meant to be watching reaches nobody. The invite
+        lives here, not only on the new-order screen, so leaving that screen
+        before she scanned does not lose it.
+      */}
+      {isTailor && order.customer && !order.customer.claimed ? (
+        <ClaimInvite
+          customer={order.customer}
+          why="Until she does, she cannot pay for this order or see the work as you tick it off."
+        />
+      ) : null}
 
       <div className="card" style={{ marginBottom: 16 }}>
         <h2 style={{ fontSize: 18 }}>Money</h2>
