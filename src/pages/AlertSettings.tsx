@@ -42,7 +42,9 @@ function pushCopy(state: ReturnType<typeof usePushNotifications>["state"]) {
 export default function AlertSettings() {
   const { state, busy, problem: pushProblem, enable, disable } = usePushNotifications();
 
-  const [groups, setGroups] = useState<NotificationGroup[]>([]);
+  // null until loaded, so an account offered no switches (an admin) is told
+  // so rather than shown an empty card while the request is in flight.
+  const [groups, setGroups] = useState<NotificationGroup[] | null>(null);
   const [preferences, setPreferences] = useState<Preferences>({});
   const [devices, setDevices] = useState<Device[]>([]);
   const [saving, setSaving] = useState(false);
@@ -140,7 +142,14 @@ export default function AlertSettings() {
           your notifications list.
         </p>
 
-        {groups.map((group) => (
+        {groups?.length === 0 ? (
+          <p style={{ color: "var(--ink-soft)" }}>
+            Every alert your account gets is about the account itself, and those cannot be turned
+            off.
+          </p>
+        ) : null}
+
+        {groups?.map((group) => (
           <label className="switch-row" key={group.key}>
             <div className="text">
               <div className="label">{group.label}</div>
