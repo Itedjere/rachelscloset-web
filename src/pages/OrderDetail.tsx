@@ -22,6 +22,7 @@ export default function OrderDetail() {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [disputed, setDisputed] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -355,11 +356,41 @@ export default function OrderDetail() {
       {/* Once she has the garment in her hands, both sides can say so. */}
       <OrderReviews orderId={order.id} />
 
+      {/* Asked about first. It cannot be undone, and on a five-inch screen it
+          is one thumb's slip from whatever was scrolled past last. */}
       {order.status === "pending_payment" ? (
         <div className="row-actions">
-          <button type="button" className="btn quiet" onClick={() => void act("cancel")} disabled={busy}>
+          <button type="button" className="btn quiet" onClick={() => setCancelling(true)} disabled={busy}>
             Cancel this order
           </button>
+        </div>
+      ) : null}
+
+      {cancelling && order.status === "pending_payment" ? (
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Cancel this order">
+          <div className="lightbox-inner confirm-panel">
+            <h2 style={{ fontSize: 18 }}>Cancel this order?</h2>
+            <p className="hint">
+              {/* Nobody is told by the platform, so she is reminded to say it herself. */}
+              {isTailor
+                ? `It cannot be undone. To make it after all, you would open a new order. Nothing has been paid, so no money moves. Rachel's Closet does not tell ${other?.name ?? "your customer"} — let her know yourself.`
+                : `It cannot be undone. Nothing has been paid, so no money moves. Rachel's Closet does not tell ${other?.name ?? "your tailor"} — let her know yourself.`}
+            </p>
+
+            <div className="row-actions">
+              <button
+                type="button"
+                className="btn danger"
+                disabled={busy}
+                onClick={() => void act("cancel").then(() => setCancelling(false))}
+              >
+                {busy ? "Cancelling…" : "Yes, cancel it"}
+              </button>
+              <button type="button" className="btn quiet" disabled={busy} onClick={() => setCancelling(false)}>
+                Keep the order
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
     </>
