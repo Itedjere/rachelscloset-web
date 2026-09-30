@@ -33,7 +33,15 @@ const GROUPS: Group[] = [
     heading: "Production",
     items: [
       { to: "/orders", label: "Orders", icon: "check" },
-      { to: "/garments", label: "Garments", icon: "garment" },
+      /*
+       * Not for customers. The page is a catalogue of garment types and the
+       * production stages behind them -- an admin curates it and a tailor
+       * arranges her own stages within it. A customer can do neither, and the
+       * stages of HER order are already on her order page, in the tracker.
+       * A nav link she can only read and leave teaches her the menu is
+       * scenery.
+       */
+      { to: "/garments", label: "Garments", icon: "garment", allow: ["tailor", "admin"] },
       { to: "/portfolio", label: "Your gallery", icon: "image", allow: ["tailor"] },
       { to: "/card", label: "Your card", icon: "qr", allow: ["tailor"] },
       { to: "/subscription", label: "Your listing", icon: "star", allow: ["tailor"] },
