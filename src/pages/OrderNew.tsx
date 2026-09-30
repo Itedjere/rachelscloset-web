@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "../components/Avatar";
+import MoneyInput from "../components/MoneyInput";
 import { ApiError, api, errorMessage } from "../lib/api";
 import { naira } from "../lib/money";
 import type { FoundCustomer, GarmentType, Order, ResourceResponse } from "../types/api";
@@ -159,27 +160,13 @@ export default function OrderNew() {
 
           <div className="field">
             <label htmlFor="amount">Price</label>
-            <input
-              id="amount"
-              type="number"
-              inputMode="numeric"
-              min="1"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
+            <MoneyInput id="amount" value={amount} onChange={setAmount} />
             {fieldErrors.amount ? <p className="error">{fieldErrors.amount[0]}</p> : null}
           </div>
 
           <div className="field">
             <label htmlFor="deposit">Deposit now (optional)</label>
-            <input
-              id="deposit"
-              type="number"
-              inputMode="numeric"
-              min="0"
-              value={deposit}
-              onChange={(e) => setDeposit(e.target.value)}
-            />
+            <MoneyInput id="deposit" value={deposit} onChange={setDeposit} />
             <p className="hint">
               Leave empty if she pays it all on collection. A deposit is what makes an
               uncollected garment cost her something.

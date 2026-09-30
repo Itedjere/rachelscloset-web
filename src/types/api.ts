@@ -277,6 +277,8 @@ export interface PlatformSettingRow {
   min: number;
   max: number;
   group: string;
+  /** Naira rather than days or a percentage, so the field groups digits. */
+  money: boolean;
 }
 
 /* ---- The business card (Section 16) -------------------------------------- */

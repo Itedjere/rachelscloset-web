@@ -105,7 +105,8 @@ export default function Orders() {
 
                 <div className="order-row__money">
                   <strong>{naira(order.amount)}</strong>
-                  {order.escrow ? <span className="hint">held</span> : null}
+                  {/* "held" on its own never said by whom. */}
+                  {order.escrow ? <span className="hint">money held safe</span> : null}
                 </div>
               </Link>
             );

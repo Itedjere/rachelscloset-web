@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import MoneyInput from "../../components/MoneyInput";
 import { api, errorMessage } from "../../lib/api";
 import type { PlatformSettingRow } from "../../types/api";
 
@@ -81,15 +82,21 @@ export default function Settings() {
             .map((row) => (
               <label className="field setting" key={row.key}>
                 <span>{row.label}</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={row.min}
-                  max={row.max}
-                  defaultValue={row.value}
-                  disabled={savingKey === row.key}
-                  onBlur={(event) => void save(row, event.target.value)}
-                />
+                {/* Two of these rows are naira and the rest are days,
+                    counts and percentages. The server says which. */}
+                {row.money ? (
+                  <MoneySetting row={row} busy={savingKey === row.key} onSave={save} />
+                ) : (
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={row.min}
+                    max={row.max}
+                    defaultValue={row.value}
+                    disabled={savingKey === row.key}
+                    onBlur={(event) => void save(row, event.target.value)}
+                  />
+                )}
                 <p className="hint">
                   {row.help} Between {row.min} and {row.max}.
                   {savedKey === row.key ? <strong> Saved.</strong> : null}
@@ -99,5 +106,31 @@ export default function Settings() {
         </div>
       ))}
     </>
+  );
+}
+
+/**
+ * A price, grouped as it is typed.
+ *
+ * Its own component because the rest of this screen is uncontrolled -- every
+ * other row saves a `defaultValue` on blur -- and a field that reformats
+ * while you type has to be controlled. Keeping that local means the money
+ * rows do not make the other eleven controlled for nothing.
+ */
+function MoneySetting({
+  row,
+  busy,
+  onSave,
+}: {
+  row: PlatformSettingRow;
+  busy: boolean;
+  onSave: (row: PlatformSettingRow, value: string) => Promise<void> | void;
+}) {
+  const [value, setValue] = useState(row.value);
+
+  return (
+    <span onBlur={() => void onSave(row, value)}>
+      <MoneyInput value={value} onChange={setValue} disabled={busy} max={String(row.max)} />
+    </span>
   );
 }

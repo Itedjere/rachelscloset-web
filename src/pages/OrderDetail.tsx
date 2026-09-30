@@ -9,6 +9,7 @@ import OrderReviews from "../components/OrderReviews";
 import OrderTracker from "../components/OrderTracker";
 import { useAuth } from "../hooks/useAuth";
 import { api, errorMessage } from "../lib/api";
+import { longDate } from "../lib/format";
 import { naira } from "../lib/money";
 import type { Order, ResourceResponse } from "../types/api";
 
@@ -139,8 +140,22 @@ export default function OrderDetail() {
             </div>
           ) : null}
           <div>
-            <dt>Held by us</dt>
-            <dd>{order.escrow ? "Yes, until collection" : "No, paid to the tailor"}</dd>
+            {/*
+              "Held by us" made a tailor ask who "us" is. The platform is
+              named, and the sentence says what will happen to her money
+              rather than naming the arrangement it is under -- nobody on
+              either side of this has ever used the word escrow.
+            */}
+            <dt>Where the money is</dt>
+            <dd>
+              {order.escrow
+                ? isTailor
+                  ? "Rachel's Closet is keeping it until she has the clothes"
+                  : "Rachel's Closet is keeping it until you have your clothes"
+                : isTailor
+                  ? "Paid straight to you"
+                  : "Paid straight to your tailor"}
+            </dd>
           </div>
         </dl>
 
@@ -159,13 +174,13 @@ export default function OrderDetail() {
             {order.due_date ? (
               <div>
                 <dt>Promised for</dt>
-                <dd>{order.due_date}</dd>
+                <dd>{longDate(order.due_date)}</dd>
               </div>
             ) : null}
             {order.collection_deadline ? (
               <div>
                 <dt>Collect by</dt>
-                <dd>{order.collection_deadline}</dd>
+                <dd>{longDate(order.collection_deadline)}</dd>
               </div>
             ) : null}
           </dl>
@@ -217,7 +232,7 @@ export default function OrderDetail() {
         <div className="card">
           <h2 style={{ fontSize: 18 }}>Has it gone?</h2>
           <p className="hint">
-            If you posted it we wait for her to say it arrived before sending your money.
+            If you posted it, your money waits until she says it reached her.
           </p>
           <div className="row-actions">
             <button
@@ -248,8 +263,8 @@ export default function OrderDetail() {
         <div className="card">
           <h2 style={{ fontSize: 18 }}>Has it reached you?</h2>
           <p className="hint">
-            Your tailor sent this one to you. Tell us when it arrives and we start counting
-            the few days before she is paid.
+            Your tailor posted this one to you. Tap here when it reaches you, and Rachel's
+            Closet starts counting the few days before she is paid.
           </p>
           <button type="button" className="btn" onClick={() => void act("received")} disabled={busy}>
             It arrived
@@ -266,8 +281,8 @@ export default function OrderDetail() {
         <div className="card">
           <h2 style={{ fontSize: 18 }}>Is everything right?</h2>
           <p className="hint">
-            Saying yes sends your tailor her money straight away. If you say nothing we send
-            it after a few days anyway.
+            Saying yes sends your tailor her money straight away. If you say nothing, Rachel's
+            Closet sends it to her after a few days anyway.
           </p>
           <button type="button" className="btn" onClick={() => void act("confirm")} disabled={busy}>
             Yes, I am happy with it
@@ -280,7 +295,7 @@ export default function OrderDetail() {
       {isTailor && order.escrow && order.can_release ? (
         <div className="card">
           <h2 style={{ fontSize: 18 }}>Your money is ready</h2>
-          <p className="hint">The waiting period is over. Send it to your account.</p>
+          <p className="hint">The waiting time is over. Send it to your bank account.</p>
           <button type="button" className="btn" onClick={() => void act("release")} disabled={busy}>
             Send me my money
           </button>
@@ -289,21 +304,32 @@ export default function OrderDetail() {
 
       {order.payout ? (
         <div className="card">
-          <h2 style={{ fontSize: 18 }}>{isTailor ? "Your payout" : "Held by us"}</h2>
+          <h2 style={{ fontSize: 18 }}>
+            {isTailor ? "Your money for this job" : "Your tailor's money"}
+          </h2>
           <dl className="facts">
             <div>
-              <dt>Amount</dt>
+              <dt>{isTailor ? "You will get" : "She will get"}</dt>
               <dd>{naira(order.payout.net_amount)}</dd>
             </div>
             {Number(order.payout.refunded_amount) > 0 ? (
               <div>
-                <dt>Refunded</dt>
+                <dt>{isTailor ? "Sent back to your customer" : "Sent back to you"}</dt>
                 <dd>{naira(order.payout.refunded_amount)}</dd>
               </div>
             ) : null}
             <div>
-              <dt>Status</dt>
-              <dd>{order.payout.status === "released" ? "Sent" : "Waiting"}</dd>
+              {/* "Status: Waiting" told nobody what it was waiting for. */}
+              <dt>Sent to the bank?</dt>
+              <dd>
+                {order.payout.status === "released"
+                  ? isTailor
+                    ? "Yes, it is on its way to you"
+                    : "Yes, she has been paid"
+                  : isTailor
+                    ? "Not yet"
+                    : "Not yet — after you have the clothes"}
+              </dd>
             </div>
           </dl>
           {isTailor && order.payout.failure_reason ? (

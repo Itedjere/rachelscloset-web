@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import MoneyInput from "../../components/MoneyInput";
 import OrderStatusPill from "../../components/OrderStatusPill";
 import { api, errorMessage } from "../../lib/api";
 import { naira } from "../../lib/money";
@@ -78,7 +79,7 @@ export default function AdminOrderDetail() {
             <dd>{naira(order.paid_total)}</dd>
           </div>
           <div>
-            <dt>Held by us</dt>
+            <dt>Held by Rachel's Closet</dt>
             <dd>{order.escrow ? "Yes" : "No — paid direct to the tailor"}</dd>
           </div>
           {order.payout ? (
@@ -198,15 +199,13 @@ function RefundPanel({ order, onDone }: { order: Order; onDone: () => void }) {
 
           <div className="field">
             <label htmlFor="amount">How much to send back</label>
-            <input
+            <MoneyInput
               id="amount"
-              type="number"
-              inputMode="numeric"
-              min="1"
-              max={paid - alreadyRefunded}
               value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
+              max={String(paid - alreadyRefunded)}
+              onChange={(next) => {
+                setAmount(next);
+                // Any edit invalidates the figures already confirmed against.
                 setConfirming(false);
               }}
             />

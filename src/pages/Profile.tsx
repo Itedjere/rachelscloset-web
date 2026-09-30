@@ -45,7 +45,7 @@ export default function Profile() {
     <>
       <div className="page-head">
         <h1>Your details</h1>
-        <p>Your photo and how we address you.</p>
+        <p>Your photo and the name other people see.</p>
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>

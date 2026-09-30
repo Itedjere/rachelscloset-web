@@ -103,11 +103,11 @@ export default function BankAccount() {
     <>
       <div className="page-head">
         <h1>Where you get paid</h1>
-        <p>Only needed if you take orders where we hold the money until collection.</p>
+        <p>Only needed for orders where Rachel's Closet keeps the money until your customer collects.</p>
       </div>
 
       {problem ? <p className="notice bad">{problem}</p> : null}
-      {saved ? <p className="notice info">Saved. Payouts will go here.</p> : null}
+      {saved ? <p className="notice info">Saved. Your money will be sent to this account.</p> : null}
 
       {stored?.verified ? (
         <div className="card" style={{ marginBottom: 16 }}>

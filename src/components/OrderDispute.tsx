@@ -95,15 +95,15 @@ export default function OrderDispute({
         <p className="dispute__reason">“{dispute.reason}”</p>
         <p className="hint">
           {dispute.opened_by_staff
-            ? "Taken down over the phone by us."
+            ? "Written down by Rachel's Closet during a phone call."
             : `Raised by ${dispute.raised_by?.name ?? "the customer"}.`}
         </p>
 
         {dispute.status === "open" ? (
           <p className="notice">
             {isTailor
-              ? "The money for this order is held until we have spoken to both of you. We will call."
-              : "Your money is held here until we have spoken to you both. We will call you."}
+              ? "Your money for this order stays with Rachel's Closet until somebody has spoken to you both. Expect a call."
+              : "Your money stays with Rachel's Closet until somebody has spoken to you and your tailor. Expect a call."}
           </p>
         ) : (
           <Outcome dispute={dispute} isTailor={isTailor} />
@@ -119,7 +119,7 @@ export default function OrderDispute({
     <div className="card">
       <h2 style={{ fontSize: 18 }}>Is something wrong with this order?</h2>
       <p className="hint">
-        Tell us and we will hold the money here while we call you and your tailor.
+        Tell Rachel's Closet. The money stays put until somebody has called you both.
       </p>
 
       {problem ? <p className="notice bad">{problem}</p> : null}
@@ -127,7 +127,7 @@ export default function OrderDispute({
       {open ? (
         <>
           <label className="field">
-            <span>What is wrong? A sentence is enough — we will ring you.</span>
+            <span>What is wrong? A sentence is enough — somebody will call you about it.</span>
             <textarea
               rows={3}
               value={reason}
@@ -171,8 +171,8 @@ function Outcome({ dispute, isTailor }: { dispute: Dispute; isTailor: boolean })
           ? "Nothing needed to change, so the order carried on as normal."
           : dispute.outcome === "released"
             ? isTailor
-              ? "We agreed the work was right. You were paid in full."
-              : "We agreed the work was right, so your tailor was paid."
+              ? "Everyone agreed the work was right, so you were paid in full."
+              : "Everyone agreed the work was right, so your tailor was paid."
             : isTailor
               ? `${naira(refunded ?? "0")} went back to your customer. Anything left over was paid to you.`
               : `${naira(refunded ?? "0")} went back to you.`}

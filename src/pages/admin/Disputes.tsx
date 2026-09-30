@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import MoneyInput from "../../components/MoneyInput";
 import { api, errorMessage } from "../../lib/api";
+import { longDate } from "../../lib/format";
 import { naira } from "../../lib/money";
 import type { AdminDispute } from "../../types/api";
 
@@ -64,7 +66,7 @@ export default function Disputes() {
                   <strong>{dispute.order?.garment ?? "Order"}</strong>
                   <div className="hint">
                     {dispute.order?.reference ?? "—"} ·{" "}
-                    {new Date(dispute.created_at).toLocaleDateString()}
+                    {longDate(dispute.created_at)}
                     {dispute.opened_by_staff ? " · taken by phone" : ""}
                   </div>
                 </div>
@@ -235,14 +237,7 @@ function SettlePanel({
             {!whole ? (
               <label className="field">
                 <span>How much goes back to her</span>
-                <input
-                  type="number"
-                  min="1"
-                  max={paid}
-                  step="0.01"
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                />
+                <MoneyInput value={amount} onChange={setAmount} max={paid} />
               </label>
             ) : null}
           </>

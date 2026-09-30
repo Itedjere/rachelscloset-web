@@ -2640,3 +2640,42 @@ a {
 [data-theme="dark"] .choice--on {
   background: var(--surface-2);
 }
+
+/* ---------------------------------------------------------------------------
+   Money typed into a field
+   --------------------------------------------------------------------------- */
+
+.money-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.money-input:focus-within {
+  border-color: var(--plum);
+  box-shadow: 0 0 0 3px var(--plum-tint);
+}
+
+/* The mark lives outside the input so it cannot be typed over or deleted. */
+.money-input__mark {
+  color: var(--ink-mute);
+  font-size: 16px;
+}
+
+.money-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.money-input input:focus {
+  outline: none;
+  box-shadow: none;
+}

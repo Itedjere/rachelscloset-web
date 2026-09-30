@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errorMessage } from "../lib/api";
+import { longDate } from "../lib/format";
 import { naira } from "../lib/money";
 import type { SubscriptionState } from "../types/api";
 
@@ -128,7 +129,7 @@ export default function Subscription() {
                 <div>
                   <strong>{term.days} days</strong>
                   <div className="hint">
-                    {term.starts_at.slice(0, 10)} → {term.ends_at.slice(0, 10)}
+                    {longDate(term.starts_at)} → {longDate(term.ends_at)}
                   </div>
                 </div>
                 <span className="hint">

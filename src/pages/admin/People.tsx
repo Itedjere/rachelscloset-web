@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Avatar from "../../components/Avatar";
 import { api, errorMessage } from "../../lib/api";
+import { longDate } from "../../lib/format";
 import type { AdminUser, PinResetIssue } from "../../types/api";
 
 /**
@@ -149,7 +150,7 @@ export default function People() {
                 {user.status === "suspended" ? (
                   <div className="hint">
                     Paused
-                    {user.suspended_until ? ` until ${user.suspended_until.slice(0, 10)}` : ""}
+                    {user.suspended_until ? ` until ${longDate(user.suspended_until)}` : ""}
                   </div>
                 ) : null}
               </div>

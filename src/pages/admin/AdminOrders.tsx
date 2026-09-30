@@ -128,7 +128,7 @@ export default function AdminOrders() {
 
               <div className="order-row__money">
                 <strong>{naira(order.amount)}</strong>
-                <span className="hint">{order.escrow ? "held" : "direct"}</span>
+                <span className="hint">{order.escrow ? "held by us" : "paid direct"}</span>
               </div>
             </Link>
           ))}

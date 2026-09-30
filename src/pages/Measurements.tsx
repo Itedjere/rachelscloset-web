@@ -5,6 +5,7 @@ import ClaimInvite from "../components/ClaimInvite";
 import Icon from "../components/Icon";
 import { useAuth } from "../hooks/useAuth";
 import { api, errorMessage } from "../lib/api";
+import { longDate } from "../lib/format";
 import { shrinkImage } from "../lib/image";
 import type { MeasurementSet } from "../types/api";
 
@@ -149,7 +150,7 @@ function MeasurementCard({
         <div>
           <strong>{set.label ?? "Measurements"}</strong>
           <div className="hint">
-            {set.taken_on ?? set.created_at.slice(0, 10)}
+            {longDate(set.taken_on ?? set.created_at)}
             {set.recorded_by ? ` · by ${set.recorded_by.name}` : ""}
           </div>
         </div>
