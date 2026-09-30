@@ -2678,6 +2678,38 @@ a {
 }
 
 /* ---------------------------------------------------------------------------
+   Six boxes for six digits
+   --------------------------------------------------------------------------- */
+
+.pin-boxes {
+  display: flex;
+  gap: 8px;
+}
+
+.pin-boxes input {
+  flex: 1 1 0;
+  /* No smaller than a fingertip, and no wider than it needs to be: six of
+     these have to fit across the narrowest phone this is read on. */
+  min-width: 0;
+  max-width: 56px;
+  height: 52px;
+  padding: 0;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.pin-boxes input:focus {
+  outline: none;
+  border-color: var(--plum);
+  box-shadow: 0 0 0 3px var(--plum-tint);
+}
+
+/* ---------------------------------------------------------------------------
    Money typed into a field
    --------------------------------------------------------------------------- */
 

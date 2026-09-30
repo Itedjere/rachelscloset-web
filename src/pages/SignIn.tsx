@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
+import PinInput from "../components/PinInput";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError, errorMessage } from "../lib/api";
 
@@ -9,6 +10,7 @@ export default function SignIn() {
   const [pin, setPin] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const phoneRef = useRef<HTMLInputElement>(null);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -30,6 +32,23 @@ export default function SignIn() {
     }
   }
 
+  /**
+   * The sixth digit signs her in.
+   *
+   * Unless there is no phone number yet -- somebody who taps the PIN first
+   * would otherwise get "these details do not match" for a field she has not
+   * filled in. Sending her back to it says the true thing.
+   */
+  async function complete() {
+    if (identifier.trim() === "") {
+      phoneRef.current?.focus();
+
+      return;
+    }
+
+    await submit(new Event("submit") as unknown as React.FormEvent);
+  }
+
   return (
     <div className="card form-card">
       <h1>Sign in</h1>
@@ -42,6 +61,7 @@ export default function SignIn() {
           <input
             id="identifier"
             name="identifier"
+            ref={phoneRef}
             /* `tel`, so the phone opens its numeric keypad rather than a full
                keyboard. The same reason the PIN is six digits at all. */
             type="tel"
@@ -53,19 +73,19 @@ export default function SignIn() {
         </div>
 
         <div className="field">
-          <label htmlFor="pin">Your 6-digit PIN</label>
-          <input
-            id="pin"
-            name="pin"
-            type="password"
-            className="pin"
-            inputMode="numeric"
+          <span>Your 6-digit PIN</span>
+          {/*
+            The sixth digit signs her in. Nobody who has just tapped a keypad
+            six times should then have to find a button, and the form's own
+            validation still runs -- requestSubmit refuses if the phone
+            number above is empty and points at it instead.
+          */}
+          <PinInput
+            label="Your 6-digit PIN"
             autoComplete="current-password"
-            maxLength={6}
             value={pin}
-            /* Digits only. A stray letter from a predictive keyboard would
-               otherwise fail at the server with nothing visible to explain it. */
-            onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
+            onChange={setPin}
+            onComplete={() => void complete()}
           />
         </div>
 

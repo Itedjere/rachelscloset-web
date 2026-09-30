@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import PinInput from "../components/PinInput";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { api, errorMessage } from "../lib/api";
@@ -27,6 +28,7 @@ export default function Claim() {
 
   const [pin, setPin] = useState("");
   const [confirm, setConfirm] = useState("");
+  const confirmRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -96,14 +98,11 @@ export default function Claim() {
 
             <label className="field">
               <span>The six numbers your tailor read to you</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="\d{6}"
-                maxLength={6}
+              <PinInput
+                label="The six numbers you were read"
+                autoComplete="one-time-code"
                 value={code}
-                onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
-                required
+                onChange={setCode}
               />
             </label>
           </>
@@ -116,30 +115,27 @@ export default function Claim() {
         */}
         <label className="field">
           <span>Choose six numbers</span>
-          <input
-            type="password"
-            inputMode="numeric"
+          {/* Six here moves to the confirmation rather than submitting:
+              the second row is the whole point of asking twice. */}
+          <PinInput
+            label="Choose six numbers"
             autoComplete="new-password"
-            pattern="\d{6}"
-            maxLength={6}
             value={pin}
-            onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
-            required
+            onChange={setPin}
+            onComplete={() => confirmRef.current?.querySelector("input")?.focus()}
           />
         </label>
 
         <label className="field">
           <span>Type them again</span>
-          <input
-            type="password"
-            inputMode="numeric"
-            autoComplete="new-password"
-            pattern="\d{6}"
-            maxLength={6}
-            value={confirm}
-            onChange={(event) => setConfirm(event.target.value.replace(/\D/g, ""))}
-            required
-          />
+          <div ref={confirmRef}>
+            <PinInput
+              label="Type them again"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={setConfirm}
+            />
+          </div>
         </label>
 
         {/*
