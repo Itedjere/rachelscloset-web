@@ -2747,3 +2747,336 @@ a {
   outline: none;
   box-shadow: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Lightbox: one photograph, and a way through the rest
+
+   A native <dialog>, so the focus trap, the inert background and Escape come
+   from the browser rather than from a library. ::backdrop is the browser's
+   own layer -- nothing here paints one.
+   --------------------------------------------------------------------------- */
+
+.lb {
+  width: min(1100px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* On [open] only: any author `display` beats the browser's hiding of a closed
+   <dialog>, which is how the public site's closed lightbox ended up drawn
+   under its footer. */
+.lb[open] {
+  /*
+   * A flex column, so the stage simply takes what is left.
+   *
+   * It used to be `height: calc(100dvh - 210px)` with a second guess at
+   * 190px on small screens, and both were wrong the moment a caption ran to
+   * two lines or the actions row appeared -- the picture either overflowed
+   * the dialog or left a band of dead space. Nothing here now knows the
+   * height of anything else.
+   */
+  display: flex;
+  flex-direction: column;
+}
+
+.lb::backdrop {
+  background: rgba(12, 8, 18, 0.92);
+}
+
+.lb > * {
+  /* The dialog is transparent; everything inside it sits on the backdrop. */
+  position: relative;
+  z-index: 1;
+}
+
+.lb__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 16px 8px;
+}
+
+.lb__count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.lb__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.lb__icon:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/*
+ * Arrow, photograph, arrow -- as three items in a row, not two buttons
+ * floating over the middle one.
+ *
+ * Absolutely positioned arrows sat ON TOP of the photograph, so a landscape
+ * shot covered both of them and the only way past was the keyboard. As flex
+ * items they take their own width and the picture gets what is left, which
+ * makes the overlap impossible rather than merely unlikely.
+ */
+.lb__stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+  padding: 0 8px;
+  /* A drag is a gesture here, so the browser must not also read it as a
+     horizontal pan, and a long press must not start a text selection. */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.lb__stage img {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  /* Firefox and Safari start a native image drag otherwise, which cancels
+     the pointer stream halfway through the gesture. */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* While a finger or the mouse is down, the photograph tracks it and the
+   entry animation must not fight the inline transform. */
+.lb__stage.is-dragging img {
+  animation: none;
+  cursor: grabbing;
+}
+
+.lb__stage.is-dragging {
+  cursor: grabbing;
+}
+
+/* ---------------------------------------------------------------------------
+   The photograph arriving
+
+   It enters from the side it came from, which is what makes a gallery feel
+   like it has an order rather than a pile. Transform and opacity only: both
+   are composited, so this stays smooth on the cheap Android this is read on,
+   where animating width or left would not.
+   --------------------------------------------------------------------------- */
+
+.lb__img {
+  animation: lb-fade 220ms var(--ease-out, ease-out) both;
+}
+
+.lb__img--next {
+  animation: lb-in-right 260ms var(--ease-out, ease-out) both;
+}
+
+.lb__img--prev {
+  animation: lb-in-left 260ms var(--ease-out, ease-out) both;
+}
+
+@keyframes lb-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lb-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(7%);
+  }
+}
+
+@keyframes lb-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-7%);
+  }
+}
+
+/*
+ * And none of it if she asked for no motion. Not a checkbox: on the phones
+ * this is actually read on, movement judders, so the people most likely to
+ * have set this are the ones whose hardware most needs it honoured. The
+ * gallery works identically without the animation.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .lb__img,
+  .lb__img--next,
+  .lb__img--prev {
+    animation: none;
+  }
+}
+
+.lb__arrow {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lb__arrow:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.lb__caption {
+  margin: 8px 16px 0;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.lb__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 16px 0;
+}
+
+.lb__rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 16px max(12px, env(safe-area-inset-bottom, 0px));
+  scrollbar-width: thin;
+  /*
+   * Centred, but `safe` centred.
+   *
+   * Plain `center` on a scroll container that overflows pushes the overflow
+   * out BOTH sides, and the part off the left edge cannot be scrolled back
+   * to -- so with a dozen photographs the first few become unreachable.
+   * `safe` falls back to flex-start exactly when that would happen. The
+   * unprefixed line stays first as the fallback for anything that does not
+   * understand the keyword.
+   */
+  justify-content: center;
+  justify-content: safe center;
+}
+
+.lb__thumb {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.lb__thumb--on {
+  border-color: #fff;
+  opacity: 1;
+}
+
+.lb__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* A photograph that opens is a button, so it is reachable by keyboard --
+   but it must not look like one. */
+.portfolio-item__open,
+.worn-photo__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+/* ---------------------------------------------------------------------------
+   On a phone
+
+   Where most of these are actually looked at. Two 48px arrows plus gaps take
+   112px out of a 360px screen -- a third of the picture -- so they shrink,
+   and below 480px they go entirely: a drag and the rail do the same job
+   without spending any width at all.
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .lb__arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .lb__thumb {
+    width: 54px;
+    height: 54px;
+  }
+
+  .lb__rail {
+    padding: 10px 12px max(10px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .lb__top {
+    padding: max(10px, env(safe-area-inset-top, 0px)) 12px 6px;
+  }
+
+  .lb__stage {
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lb__arrow {
+    display: none;
+  }
+
+  .lb__thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .lb__caption {
+    margin-top: 6px;
+    font-size: 13px;
+  }
+}
+
+/* A short window -- a phone on its side -- has no room for a rail as well as
+   a picture, and the picture is the point. */
+@media (max-height: 460px) {
+  .lb__rail {
+    display: none;
+  }
+
+  .lb__caption {
+    display: none;
+  }
+}

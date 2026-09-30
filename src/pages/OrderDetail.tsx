@@ -350,7 +350,7 @@ export default function OrderDetail() {
         onOpenChange={setDisputed}
       />
 
-      <OrderPhotos orderId={order.id} />
+      <OrderPhotos orderId={order.id} isTailor={isTailor} />
 
       {/* Once she has the garment in her hands, both sides can say so. */}
       <OrderReviews orderId={order.id} />

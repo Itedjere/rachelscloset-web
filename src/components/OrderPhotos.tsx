@@ -3,6 +3,7 @@ import { api, errorMessage } from "../lib/api";
 import { shrinkImage } from "../lib/image";
 import type { PortfolioPhoto } from "../types/api";
 import Icon from "./Icon";
+import Lightbox from "./Lightbox";
 
 /**
  * "You wearing it."
@@ -17,7 +18,14 @@ import Icon from "./Icon";
  * step photographs from Section 10 — those are her cloth mid-construction
  * and they stay between the two of them.
  */
-export default function OrderPhotos({ orderId }: { orderId: number }) {
+export default function OrderPhotos({
+  orderId,
+  isTailor = false,
+}: {
+  orderId: number;
+  /** The same photographs, described from the other side of the counter. */
+  isTailor?: boolean;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [photos, setPhotos] = useState<PortfolioPhoto[]>([]);
@@ -26,6 +34,7 @@ export default function OrderPhotos({ orderId }: { orderId: number }) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  const [viewing, setViewing] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -83,18 +92,36 @@ export default function OrderPhotos({ orderId }: { orderId: number }) {
 
   return (
     <div className="card" style={{ marginBottom: 16 }}>
-      <h2 style={{ fontSize: 18 }}>You wearing it</h2>
+      {/*
+        "You wearing it" is addressed to the customer and reads as nonsense to
+        the tailor, who is looking at her own work on somebody else. Same
+        photographs, same rules, described from the side of the counter the
+        reader is standing on.
+      */}
+      <h2 style={{ fontSize: 18 }}>{isTailor ? "Your work, worn" : "You wearing it"}</h2>
       <p className="hint">
-        Add up to {max} photographs of yourself in what she made. They go on her page, so
-        other people can see her work.
+        {isTailor
+          ? `Photographs your customer took of herself in what you made. She can add up to ${max}, and they go straight to your gallery.`
+          : `Add up to ${max} photographs of yourself in what she made. They go on her page, so other people can see her work.`}
       </p>
 
       {problem ? <p className="notice bad">{problem}</p> : null}
 
       <div className="step-photo-strip">
-        {photos.map((photo) => (
+        {photos.map((photo, index) => (
           <div className="worn-photo" key={photo.id}>
-            <img src={photo.url} alt={photo.caption ?? "You wearing it"} loading="lazy" />
+            <button
+              type="button"
+              className="worn-photo__open"
+              onClick={() => setViewing(index)}
+              aria-label={`Open photograph ${index + 1}`}
+            >
+              <img
+                src={photo.url}
+                alt={photo.caption ?? (isTailor ? "Your work, worn" : "You wearing it")}
+                loading="lazy"
+              />
+            </button>
             {/* Hers to take down; the tailor can only hide it. */}
             {canAdd || photo.uploaded_by ? (
               <button
@@ -136,6 +163,20 @@ export default function OrderPhotos({ orderId }: { orderId: number }) {
           </>
         ) : null}
       </div>
+
+      {viewing !== null ? (
+        <Lightbox
+          slides={photos.map((photo) => ({
+            id: photo.id,
+            url: photo.url,
+            caption: photo.caption,
+            alt: isTailor ? "Your work, worn" : "You wearing it",
+          }))}
+          index={viewing}
+          onIndex={setViewing}
+          onClose={() => setViewing(null)}
+        />
+      ) : null}
     </div>
   );
 }

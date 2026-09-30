@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Icon from "../components/Icon";
+import Lightbox from "../components/Lightbox";
 import { api, errorMessage } from "../lib/api";
 import { shrinkImage } from "../lib/image";
 import type { PortfolioPhoto } from "../types/api";
@@ -25,6 +26,7 @@ export default function Portfolio() {
   const [maxOwn, setMaxOwn] = useState(5);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [viewing, setViewing] = useState<number | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -153,8 +155,16 @@ export default function Portfolio() {
         <div className="portfolio-grid">
           {items.map((item, index) => (
             <figure className={`portfolio-item${item.hidden ? " is-hidden" : ""}`} key={item.id}>
-              {/* Public URLs: no bearer token, same image the world sees. */}
-              <img src={item.url} alt={item.caption ?? "Your work"} loading="lazy" />
+              {/* Public URLs: no bearer token, same image the world sees.
+                  A button, not a bare img, so it is reachable by keyboard. */}
+              <button
+                type="button"
+                className="portfolio-item__open"
+                onClick={() => setViewing(index)}
+                aria-label={`Open photograph ${index + 1}`}
+              >
+                <img src={item.url} alt={item.caption ?? "Your work"} loading="lazy" />
+              </button>
 
               <figcaption>
                 {item.mine ? (
@@ -211,6 +221,20 @@ export default function Portfolio() {
           ))}
         </div>
       )}
+
+      {viewing !== null ? (
+        <Lightbox
+          slides={items.map((item) => ({
+            id: item.id,
+            url: item.url,
+            caption: item.caption ?? (item.mine ? null : `From ${item.uploaded_by?.name ?? "a customer"}`),
+            alt: item.caption ?? "Your work",
+          }))}
+          index={viewing}
+          onIndex={setViewing}
+          onClose={() => setViewing(null)}
+        />
+      ) : null}
     </>
   );
 }

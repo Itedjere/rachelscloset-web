@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
-import { useAttachment } from "../hooks/useAttachment";
+import { useEffect, useRef, useState } from "react";
+import { useAttachment, useAttachments } from "../hooks/useAttachment";
 import { api, errorMessage } from "../lib/api";
 import { shrinkImage } from "../lib/image";
 import type { StepPhoto } from "../types/api";
 import Icon from "./Icon";
+import Lightbox from "./Lightbox";
 
 /** Matches OrderStepPhoto::MAX_PER_STEP. The server is the one enforcing it. */
 const MAX_PER_STEP = 3;
@@ -38,7 +39,7 @@ export default function StepPhotos({
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
-  const [viewing, setViewing] = useState<StepPhoto | null>(null);
+  const [viewing, setViewing] = useState<number | null>(null);
 
   const full = photos.length >= MAX_PER_STEP;
 
@@ -84,12 +85,12 @@ export default function StepPhotos({
   return (
     <div className="step-photos">
       <div className="step-photo-strip">
-        {photos.map((photo) => (
+        {photos.map((photo, index) => (
           <Thumbnail
             key={photo.id}
             photo={photo}
             label={label}
-            onOpen={() => setViewing(photo)}
+            onOpen={() => setViewing(index)}
           />
         ))}
 
@@ -124,13 +125,15 @@ export default function StepPhotos({
 
       {problem ? <p className="notice bad">{problem}</p> : null}
 
-      {viewing ? (
-        <Lightbox
-          photo={viewing}
+      {viewing !== null ? (
+        <StepLightbox
+          photos={photos}
           label={label}
+          index={viewing}
+          onIndex={setViewing}
           canDelete={canEdit}
           busy={busy}
-          onDelete={() => void remove(viewing)}
+          onDelete={(photo) => void remove(photo)}
           onClose={() => setViewing(null)}
         />
       ) : null}
@@ -169,69 +172,96 @@ function Thumbnail({
 }
 
 /**
- * Full size, over the page.
+ * The stage photographs, full size, with a way through the set.
  *
- * A plain overlay rather than a native <dialog>: the public site can use one
- * because it is a single static page, but inside the app a dialog that
- * survives a route change is a worse bug than the twenty lines this saves.
+ * Its own wrapper because these are the only private images in the app: they
+ * stream through the authenticated file endpoint, so every one -- the big
+ * picture and each thumbnail in the rail -- has to be fetched as a blob
+ * before it can be shown. Three per stage, so all of them at once.
+ *
+ * The overlay this replaced was a plain div rather than a <dialog>, on the
+ * grounds that a dialog surviving a route change is a worse bug than the
+ * code it saves. The shared component closes itself in an effect cleanup, so
+ * unmounting -- which is what a route change does -- shuts it.
  */
-function Lightbox({
-  photo,
+function StepLightbox({
+  photos,
   label,
+  index,
+  onIndex,
   canDelete,
   busy,
   onDelete,
   onClose,
 }: {
-  photo: StepPhoto;
+  photos: StepPhoto[];
   label: string;
+  index: number;
+  onIndex: (index: number) => void;
   canDelete: boolean;
   busy: boolean;
-  onDelete: () => void;
+  onDelete: (photo: StepPhoto) => void;
   onClose: () => void;
 }) {
-  const { objectUrl } = useAttachment(photo.url);
+  const resolved = useAttachments(photos.map((photo) => photo.url));
   const [confirming, setConfirming] = useState(false);
+  const current = photos[index];
+
+  // Moving to another photograph abandons a half-made decision about this
+  // one, which is the only sane reading of tapping an arrow.
+  useEffect(() => {
+    setConfirming(false);
+  }, [index]);
+
+  const slides = photos
+    .map((photo) => ({ photo, url: resolved[photo.url] }))
+    .filter((entry): entry is { photo: StepPhoto; url: string } => Boolean(entry.url))
+    .map((entry) => ({
+      id: entry.photo.id,
+      url: entry.url,
+      alt: `${label}, photographed`,
+    }));
+
+  // Nothing has arrived yet. Showing an empty frame is better than showing
+  // the page underneath with a dialog that has no picture in it.
+  if (slides.length === 0 || !current) {
+    return (
+      <div className="lightbox" role="dialog" aria-modal="true" aria-label={label}>
+        <p className="empty">Loading…</p>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="lightbox"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${label}, photographed`}
-      onClick={onClose}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") onClose();
-      }}
-    >
-      {/* Stops a tap on the picture itself from closing the thing. */}
-      <div className="lightbox-inner" onClick={(event) => event.stopPropagation()}>
-        {objectUrl ? <img src={objectUrl} alt={`${label}, photographed`} /> : null}
-
-        <div className="lightbox-actions">
-          {canDelete ? (
-            confirming ? (
-              <>
-                <button type="button" className="btn danger" onClick={onDelete} disabled={busy}>
-                  {busy ? "Removing…" : "Yes, remove it"}
-                </button>
-                <button type="button" className="btn quiet" onClick={() => setConfirming(false)}>
-                  Keep it
-                </button>
-              </>
-            ) : (
-              <button type="button" className="btn quiet" onClick={() => setConfirming(true)}>
-                <Icon name="trash" size={18} />
-                Remove
+    <Lightbox
+      slides={slides}
+      index={Math.min(index, slides.length - 1)}
+      onIndex={onIndex}
+      onClose={onClose}
+      actions={
+        canDelete ? (
+          confirming ? (
+            <>
+              <button
+                type="button"
+                className="btn danger"
+                onClick={() => onDelete(current)}
+                disabled={busy}
+              >
+                {busy ? "Removing…" : "Yes, remove it"}
               </button>
-            )
-          ) : null}
-
-          <button type="button" className="btn" onClick={onClose} autoFocus>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+              <button type="button" className="btn quiet" onClick={() => setConfirming(false)}>
+                Keep it
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn quiet" onClick={() => setConfirming(true)}>
+              <Icon name="trash" size={18} />
+              Remove
+            </button>
+          )
+        ) : null
+      }
+    />
   );
 }
