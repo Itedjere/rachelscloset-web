@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import PinInput from "../components/PinInput";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -118,7 +119,6 @@ export default function Claim() {
         <h1>Your tailor read you six numbers</h1>
         <p className="hint">Type your phone number, then the six numbers she gave you.</p>
 
-        {problem ? <p className="notice bad">{problem}</p> : null}
 
         <form onSubmit={(event) => void checkCode(event)}>
           {/* Six digits are not unique on their own, so they only mean
@@ -149,6 +149,8 @@ export default function Claim() {
             />
           </label>
 
+          <ActionProblem message={problem} />
+
           <button type="submit" className="btn" disabled={busy || code.length !== 6}>
             {busy ? "Checking…" : "Next"}
           </button>
@@ -178,7 +180,6 @@ export default function Claim() {
         </button>
       ) : null}
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <form onSubmit={submit}>
         {/*
@@ -225,6 +226,8 @@ export default function Claim() {
             measurements. You can stop that at any time from “Who can see my measurements”.
           </p>
         ) : null}
+
+        <ActionProblem message={problem} />
 
         <button type="submit" className="btn" disabled={busy}>
           {busy ? "Setting up…" : "This is my account"}

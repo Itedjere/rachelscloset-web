@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../../components/ActionProblem";
 import MoneyInput from "../../components/MoneyInput";
 import { api, errorMessage } from "../../lib/api";
 import type { PlatformSettingRow } from "../../types/api";
@@ -20,7 +21,9 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [savedKey, setSavedKey] = useState<string | null>(null);
+  // Loading only; a refused value shows under its own field.
   const [problem, setProblem] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ key: string; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -42,7 +45,7 @@ export default function Settings() {
     if (value === "" || value === row.value) return true;
 
     setSavingKey(row.key);
-    setProblem(null);
+    setFailed(null);
 
     try {
       // A phone row goes as text: Number("08152070480") drops the leading
@@ -60,7 +63,7 @@ export default function Settings() {
 
       return true;
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ key: row.key, message: errorMessage(error) });
       // Put the old value back rather than leave a number on screen that is
       // not the one in the database.
       setRows((current) => [...current]);
@@ -115,6 +118,9 @@ export default function Settings() {
                   {row.phone ? null : ` Between ${row.min} and ${row.max}.`}
                   {savedKey === row.key ? <strong> Saved.</strong> : null}
                 </p>
+                {/* Under the field that was refused -- this page is long, and
+                    each row saves as it is left, so the top is nowhere near. */}
+                <ActionProblem message={failed?.key === row.key ? failed.message : null} />
               </label>
             ))}
         </div>

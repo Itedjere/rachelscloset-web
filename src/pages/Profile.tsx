@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import AvatarUpload from "../components/AvatarUpload";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError, api, errorMessage } from "../lib/api";
@@ -54,9 +55,6 @@ export default function Profile() {
 
       <div className="card">
         <form onSubmit={submit} noValidate>
-          {problem ? <p className="notice bad">{problem}</p> : null}
-          {saved ? <p className="notice info">Saved.</p> : null}
-
           <div className="field">
             <label htmlFor="name">Your name</label>
             <input
@@ -91,6 +89,11 @@ export default function Profile() {
             <p className="hint">Optional. Most people here do not have one, and nothing needs it.</p>
             {fieldErrors.email ? <p className="error">{fieldErrors.email[0]}</p> : null}
           </div>
+
+          {/* Beside Save, not above the form: on a phone with the keyboard
+              open, the top of the form is off-screen. */}
+          <ActionProblem message={problem} />
+          {saved ? <p className="notice info">Saved.</p> : null}
 
           <button type="submit" className="btn" disabled={busy}>
             {busy ? "Saving…" : "Save"}

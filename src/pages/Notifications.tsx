@@ -51,6 +51,7 @@ export default function Notifications() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [problem, setProblem] = useState<string | null>(null);
+  const [rowProblem, setRowProblem] = useState<{ id: number; message: string } | null>(null);
   const [clearing, setClearing] = useState(false);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ export default function Notifications() {
    */
   async function remove(notification: AppNotification) {
     const previous = items;
+    setRowProblem(null);
 
     // Optimistic: the row goes at once. A list that waits for a round trip
     // before a delete lands invites a second tap on the same row.
@@ -114,7 +116,8 @@ export default function Notifications() {
     try {
       await api.delete(`/notifications/${notification.id}`);
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      // On the row that came back, not at the top of a long list.
+      setRowProblem({ id: notification.id, message: errorMessage(error) });
       setItems(previous);
       void load();
     }
@@ -213,6 +216,11 @@ export default function Notifications() {
                     not dismiss, it destroys. */}
                 <Icon name="trash" size={16} />
               </button>
+              {rowProblem?.id === item.id ? (
+                <p className="notice bad" style={{ gridColumn: "1 / -1", margin: "8px 0 0" }}>
+                  {rowProblem.message}
+                </p>
+              ) : null}
             </div>
           ))}
         </div>
@@ -226,6 +234,10 @@ export default function Notifications() {
               orders, your money and your measurements are not touched — only the messages
               about them.
             </p>
+
+            {/* Inside the box: it stays open when this fails, and would hide
+                the line at the top of the page behind it. */}
+            {problem ? <p className="notice bad">{problem}</p> : null}
 
             <div className="row-actions">
               <button type="button" className="btn danger" disabled={busy} onClick={() => void clearAll()}>

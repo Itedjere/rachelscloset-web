@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import PinInput from "../components/PinInput";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -114,7 +115,6 @@ export default function PinReset() {
         <h1>Rachel's Closet gave you six numbers</h1>
         <p className="hint">Type your phone number, then the six numbers you were given.</p>
 
-        {problem ? <p className="notice bad">{problem}</p> : null}
 
         <form onSubmit={(event) => void checkCode(event)}>
           <label className="field">
@@ -140,6 +140,8 @@ export default function PinReset() {
               onComplete={() => void checkCode()}
             />
           </label>
+
+          <ActionProblem message={problem} />
 
           <button type="submit" className="btn" disabled={busy || code.length !== 6}>
             {busy ? "Checking…" : "Next"}
@@ -173,7 +175,6 @@ export default function PinReset() {
         </button>
       ) : null}
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <form onSubmit={submit}>
         <label className="field">
@@ -207,6 +208,8 @@ export default function PinReset() {
         <p className="hint">
           Anywhere else you are signed in will be signed out.
         </p>
+
+        <ActionProblem message={problem} />
 
         <button type="submit" className="btn" disabled={busy}>
           {busy ? "Saving…" : "Use this number"}

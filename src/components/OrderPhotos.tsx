@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ActionProblem from "./ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import { shrinkImage } from "../lib/image";
 import type { PortfolioPhoto } from "../types/api";
@@ -105,8 +106,6 @@ export default function OrderPhotos({
           : `Add up to ${max} photographs of yourself in what she made. They go on her page, so other people can see her work.`}
       </p>
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
-
       <div className="step-photo-strip">
         {photos.map((photo, index) => (
           <div className="worn-photo" key={photo.id}>
@@ -163,6 +162,9 @@ export default function OrderPhotos({
           </>
         ) : null}
       </div>
+
+      {/* Under the photographs and the add button, not above them. */}
+      <ActionProblem message={problem} />
 
       {viewing !== null ? (
         <Lightbox

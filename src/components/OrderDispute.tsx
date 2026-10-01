@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ActionProblem from "./ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import { naira } from "../lib/money";
 import type { OrderDispute as Dispute } from "../types/api";
@@ -124,8 +125,6 @@ export default function OrderDispute({
         Tell Rachel's Closet. The money stays put until somebody has called you both.
       </p>
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
-
       {open ? (
         <>
           <label className="field">
@@ -138,6 +137,8 @@ export default function OrderDispute({
               placeholder="The gown does not fit and the colour is not what I chose."
             />
           </label>
+
+          <ActionProblem message={problem} />
 
           <div className="row-actions">
             <button

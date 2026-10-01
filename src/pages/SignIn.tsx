@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
+import ActionProblem from "../components/ActionProblem";
 import PinInput from "../components/PinInput";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError, errorMessage } from "../lib/api";
@@ -54,8 +55,6 @@ export default function SignIn() {
       <h1>Sign in</h1>
 
       <form onSubmit={submit} noValidate>
-        {problem ? <p className="notice bad">{problem}</p> : null}
-
         <div className="field">
           <label htmlFor="identifier">Phone number</label>
           <input
@@ -88,6 +87,8 @@ export default function SignIn() {
             onComplete={() => void complete()}
           />
         </div>
+
+        <ActionProblem message={problem} />
 
         <button type="submit" className="btn block" disabled={busy || pin.length < 6}>
           {busy ? "Signing in…" : "Sign in"}

@@ -133,12 +133,18 @@ function MeasurementCard({
 }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
 
   async function remove() {
     setBusy(true);
+    setProblem(null);
+
     try {
       await api.delete(`/measurements/${set.id}`);
       onDeleted();
+    } catch (error: unknown) {
+      // It used to have no catch at all: a failed delete simply did nothing.
+      setProblem(errorMessage(error));
     } finally {
       setBusy(false);
     }
@@ -193,6 +199,8 @@ function MeasurementCard({
           )}
         </div>
       ) : null}
+
+      {problem ? <p className="notice bad">{problem}</p> : null}
     </div>
   );
 }
@@ -266,8 +274,6 @@ function RecordForm({
   return (
     <div className="card" style={{ marginBottom: 16 }}>
       <h2 style={{ fontSize: 18 }}>New measurements</h2>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <button
         type="button"
@@ -358,6 +364,10 @@ function RecordForm({
       >
         Add a number
       </button>
+
+      {/* Just above Save: the form is long, and on a phone the top of it is a
+          scroll away from the button that failed. */}
+      {problem ? <p className="notice bad" style={{ marginTop: 16 }}>{problem}</p> : null}
 
       <div className="row-actions" style={{ marginTop: 16 }}>
         <button type="button" className="btn" onClick={() => void save()} disabled={busy}>

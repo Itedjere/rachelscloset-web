@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import ActionProblem from "../../components/ActionProblem";
 import Stars from "../../components/Stars";
 import { api, errorMessage } from "../../lib/api";
 import type { HeldReview } from "../../types/api";
@@ -20,7 +21,9 @@ export default function HeldReviews() {
   const [reviews, setReviews] = useState<HeldReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
+  // Loading only; a failed release shows on that review's card.
   const [problem, setProblem] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ id: number; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -39,13 +42,13 @@ export default function HeldReviews() {
 
   async function release(review: HeldReview) {
     setBusyId(review.id);
-    setProblem(null);
+    setFailed(null);
 
     try {
       await api.post(`/admin/reviews/${review.id}/release`);
       await load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ id: review.id, message: errorMessage(error) });
     } finally {
       setBusyId(null);
     }
@@ -112,6 +115,8 @@ export default function HeldReviews() {
               >
                 {busyId === review.id ? "Publishing…" : "Publish it"}
               </button>
+
+              <ActionProblem message={failed?.id === review.id ? failed.message : null} />
             </div>
           ))}
         </div>

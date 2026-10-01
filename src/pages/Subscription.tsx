@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import { longDate } from "../lib/format";
 import { naira } from "../lib/money";
@@ -21,7 +22,9 @@ export default function Subscription() {
   const [state, setState] = useState<SubscriptionState | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  // Loading only. A failed purchase shows under the plan she tapped.
   const [problem, setProblem] = useState<string | null>(null);
+  const [buyProblem, setBuyProblem] = useState<{ plan: string; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -40,7 +43,7 @@ export default function Subscription() {
 
   async function buy(plan: string) {
     setBusy(plan);
-    setProblem(null);
+    setBuyProblem(null);
 
     try {
       // Paying leaves the app: the provider hosts the page where card, bank
@@ -49,7 +52,7 @@ export default function Subscription() {
       const response = await api.post<{ data: { link: string } }>("/subscription/pay", { plan });
       window.location.href = response.data.link;
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setBuyProblem({ plan, message: errorMessage(error) });
       setBusy(null);
     }
   }
@@ -68,8 +71,6 @@ export default function Subscription() {
           Everything else — your orders, your money, your card — works either way.
         </p>
       </div>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <div className={`card standing standing--${state.status}`} style={{ marginBottom: 16 }}>
         {state.listed ? (
@@ -115,6 +116,8 @@ export default function Subscription() {
             >
               {busy === plan.plan ? "Opening…" : state.listed ? "Add these days" : "Get listed"}
             </button>
+
+            <ActionProblem message={buyProblem?.plan === plan.plan ? buyProblem.message : null} />
           </div>
         ))}
       </div>

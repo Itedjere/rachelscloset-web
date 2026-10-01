@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import Icon from "../components/Icon";
 import Lightbox from "../components/Lightbox";
 import { api, errorMessage } from "../lib/api";
@@ -27,7 +28,11 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [viewing, setViewing] = useState<number | null>(null);
+  // Loading only. An upload and an action on one photograph each show their
+  // own failure beside the button that caused it.
   const [problem, setProblem] = useState<string | null>(null);
+  const [uploadProblem, setUploadProblem] = useState<string | null>(null);
+  const [itemProblem, setItemProblem] = useState<{ id: number; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -53,7 +58,7 @@ export default function Portfolio() {
 
   async function upload(file: File) {
     setBusy(true);
-    setProblem(null);
+    setUploadProblem(null);
 
     try {
       const form = new FormData();
@@ -61,22 +66,22 @@ export default function Portfolio() {
       await api.post("/portfolio", form);
       await load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setUploadProblem(errorMessage(error));
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
 
-  async function act(path: string, method: "post" | "delete" = "post") {
+  async function act(id: number, path: string, method: "post" | "delete" = "post") {
     setBusy(true);
-    setProblem(null);
+    setItemProblem(null);
 
     try {
       await (method === "post" ? api.post(path) : api.delete(path));
       await load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setItemProblem({ id, message: errorMessage(error) });
     } finally {
       setBusy(false);
     }
@@ -101,8 +106,17 @@ export default function Portfolio() {
     next[target] = a;
     setItems(next);
 
+    setItemProblem(null);
+
     // The whole array, so a retry cannot half-apply.
-    await api.put("/portfolio/reorder", { ids: next.map((item) => item.id) });
+    try {
+      await api.put("/portfolio/reorder", { ids: next.map((item) => item.id) });
+    } catch (error: unknown) {
+      // It used to have no catch: a failed save left the new order on
+      // screen as if it had stuck. Put the real one back, and say why.
+      setItemProblem({ id: a.id, message: errorMessage(error) });
+      void load();
+    }
   }
 
   if (loading) return <p className="empty">Loading…</p>;
@@ -145,6 +159,8 @@ export default function Portfolio() {
             if (file) void upload(file);
           }}
         />
+
+        <ActionProblem message={uploadProblem} />
       </div>
 
       {items.length === 0 ? (
@@ -199,7 +215,7 @@ export default function Portfolio() {
                 <button
                   type="button"
                   className="btn quiet"
-                  onClick={() => void act(`/portfolio/${item.id}/${item.hidden ? "show" : "hide"}`)}
+                  onClick={() => void act(item.id, `/portfolio/${item.id}/${item.hidden ? "show" : "hide"}`)}
                   disabled={busy}
                 >
                   {item.hidden ? "Show" : "Hide"}
@@ -210,13 +226,15 @@ export default function Portfolio() {
                   <button
                     type="button"
                     className="btn quiet"
-                    onClick={() => void act(`/portfolio/${item.id}`, "delete")}
+                    onClick={() => void act(item.id, `/portfolio/${item.id}`, "delete")}
                     disabled={busy}
                   >
                     <Icon name="trash" size={16} />
                   </button>
                 ) : null}
               </div>
+
+              <ActionProblem message={itemProblem?.id === item.id ? itemProblem.message : null} />
             </figure>
           ))}
         </div>

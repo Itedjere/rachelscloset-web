@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ActionProblem from "./ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import { longDate } from "../lib/format";
 import { naira } from "../lib/money";
@@ -32,7 +33,8 @@ export default function DirectPayments({
   const [other, setOther] = useState("");
   const [busy, setBusy] = useState(false);
   const [removing, setRemoving] = useState<number | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
+  // Where it failed: the form's button, or one entry's remove.
+  const [failed, setFailed] = useState<{ at: "record" | number; message: string } | null>(null);
 
   const paid = Number(order.paid_total);
   const outstanding = Math.max(0, Number(order.amount) - paid);
@@ -50,7 +52,7 @@ export default function DirectPayments({
 
   async function record() {
     setBusy(true);
-    setProblem(null);
+    setFailed(null);
 
     try {
       await api.post(`/orders/${order.id}/direct-payments`, { amount: amount.toFixed(2) });
@@ -59,7 +61,7 @@ export default function DirectPayments({
       setOther("");
       onChanged();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: "record", message: errorMessage(error) });
     } finally {
       setBusy(false);
     }
@@ -67,14 +69,14 @@ export default function DirectPayments({
 
   async function remove(id: number) {
     setBusy(true);
-    setProblem(null);
+    setFailed(null);
 
     try {
       await api.delete(`/orders/${order.id}/direct-payments/${id}`);
       setRemoving(null);
       onChanged();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: id, message: errorMessage(error) });
     } finally {
       setBusy(false);
     }
@@ -82,8 +84,6 @@ export default function DirectPayments({
 
   return (
     <div className="direct-pay">
-      {problem ? <p className="notice bad">{problem}</p> : null}
-
       {order.direct_payments.length > 0 ? (
         <ul className="direct-pay__list">
           {order.direct_payments.map((entry) => (
@@ -117,6 +117,8 @@ export default function DirectPayments({
                   </button>
                 )
               ) : null}
+
+              <ActionProblem message={failed?.at === entry.id ? failed.message : null} />
             </li>
           ))}
         </ul>
@@ -180,6 +182,8 @@ export default function DirectPayments({
           <p className="hint" style={{ margin: 0 }}>
             She will be sent a note of it, so she can check it is right.
           </p>
+
+          <ActionProblem message={failed?.at === "record" ? failed.message : null} />
 
           <div className="row-actions" style={{ marginTop: 0 }}>
             <button

@@ -133,6 +133,7 @@ export default function StepPhotos({
           onIndex={setViewing}
           canDelete={canEdit}
           busy={busy}
+          problem={problem}
           onDelete={(photo) => void remove(photo)}
           onClose={() => setViewing(null)}
         />
@@ -191,6 +192,7 @@ function StepLightbox({
   onIndex,
   canDelete,
   busy,
+  problem,
   onDelete,
   onClose,
 }: {
@@ -200,6 +202,8 @@ function StepLightbox({
   onIndex: (index: number) => void;
   canDelete: boolean;
   busy: boolean;
+  /** Why removing failed. Shown in here: the viewer stays open over the page. */
+  problem: string | null;
   onDelete: (photo: StepPhoto) => void;
   onClose: () => void;
 }) {
@@ -242,6 +246,7 @@ function StepLightbox({
         canDelete ? (
           confirming ? (
             <>
+              {problem ? <span className="notice bad">{problem}</span> : null}
               <button
                 type="button"
                 className="btn danger"

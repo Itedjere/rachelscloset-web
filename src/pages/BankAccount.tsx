@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import type { ResourceResponse } from "../types/api";
 
@@ -106,9 +107,6 @@ export default function BankAccount() {
         <p>Only needed for orders where Rachel's Closet keeps the money until your customer collects.</p>
       </div>
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
-      {saved ? <p className="notice info">Saved. Your money will be sent to this account.</p> : null}
-
       {stored?.verified ? (
         <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>On file</h2>
@@ -183,6 +181,11 @@ export default function BankAccount() {
             </button>
           )}
         </div>
+
+        {/* Under the button, good news and bad: a bank refusing the number is
+            the commonest failure here, and it belongs beside "Check". */}
+        <ActionProblem message={problem} />
+        {saved ? <p className="notice info">Saved. Your money will be sent to this account.</p> : null}
       </div>
     </>
   );

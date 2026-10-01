@@ -22,7 +22,15 @@ export default function OrderDetail() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  // Loading failures only: there is no button to put that beside.
   const [problem, setProblem] = useState<string | null>(null);
+  /*
+   * A failed action, and WHICH one. Seven buttons live on this page, spread
+   * down a long screen; a single error line at the top meant a tailor tapping
+   * "She collected it" on a phone saw nothing happen, with the reason a long
+   * scroll above her thumb. Each action now shows its own failure beside it.
+   */
+  const [failed, setFailed] = useState<{ at: string; message: string } | null>(null);
   const [disputed, setDisputed] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
@@ -41,18 +49,28 @@ export default function OrderDetail() {
     void load();
   }, [load]);
 
-  async function act(path: string, body?: unknown) {
+  /** Whether it worked, so a confirmation box can stay open to show why not. */
+  async function act(path: string, body?: unknown): Promise<boolean> {
     setBusy(true);
-    setProblem(null);
+    setFailed(null);
 
     try {
       const response = await api.post<ResourceResponse<Order>>(`/orders/${orderId}/${path}`, body);
       setOrder(response.data);
+
+      return true;
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: path, message: errorMessage(error) });
+
+      return false;
     } finally {
       setBusy(false);
     }
+  }
+
+  /** The failure of this action, if that is the one that just failed. */
+  function failure(at: string) {
+    return failed?.at === at ? <p className="notice bad">{failed.message}</p> : null;
   }
 
   /*
@@ -62,13 +80,13 @@ export default function OrderDetail() {
    */
   async function pay() {
     setBusy(true);
-    setProblem(null);
+    setFailed(null);
 
     try {
       const response = await api.post<{ data: { link: string } }>(`/orders/${orderId}/pay`);
       window.location.href = response.data.link;
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: "pay", message: errorMessage(error) });
       setBusy(false);
     }
   }
@@ -92,8 +110,6 @@ export default function OrderDetail() {
           {order.description ? ` · ${order.description}` : ""}
         </p>
       </div>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="order-parties">
@@ -186,6 +202,7 @@ export default function OrderDetail() {
             {busy ? "Opening…" : `Pay ${naira(order.amount_due_up_front)}`}
           </button>
         ) : null}
+        {failure("pay")}
 
         {/* A direct order: paid by hand, recorded by the tailor. */}
         {!order.escrow ? (
@@ -244,7 +261,7 @@ export default function OrderDetail() {
               Mark ready to collect
             </button>
           ) : null}
-
+          {failure("ready")}
         </div>
       ) : null}
 
@@ -280,6 +297,7 @@ export default function OrderDetail() {
               I sent it to her
             </button>
           </div>
+          {failure("collected")}
         </div>
       ) : null}
 
@@ -297,6 +315,7 @@ export default function OrderDetail() {
           <button type="button" className="btn" onClick={() => void act("received")} disabled={busy}>
             It arrived
           </button>
+          {failure("received")}
         </div>
       ) : null}
 
@@ -315,6 +334,7 @@ export default function OrderDetail() {
           <button type="button" className="btn" onClick={() => void act("confirm")} disabled={busy}>
             Yes, I am happy with it
           </button>
+          {failure("confirm")}
         </div>
       ) : null}
 
@@ -327,6 +347,7 @@ export default function OrderDetail() {
           <button type="button" className="btn" onClick={() => void act("release")} disabled={busy}>
             Send me my money
           </button>
+          {failure("release")}
         </div>
       ) : null}
 
@@ -372,6 +393,10 @@ export default function OrderDetail() {
       {/* Both sides see this once it exists; only the customer can start it,
           and only once the garment is in her hands. */}
       <OrderDispute
+        /* Keyed on status so it asks again when the order moves on: after
+           "Yes, I am happy" the order is completed and the server stops
+           offering a dispute, but a card loaded once would keep showing it. */
+        key={order.status}
         orderId={order.id}
         isTailor={isTailor}
         onChanged={() => void load()}
@@ -404,12 +429,20 @@ export default function OrderDetail() {
                 : `It cannot be undone. Nothing has been paid, so no money moves. Rachel's Closet does not tell ${other?.name ?? "your tailor"} — let her know yourself.`}
             </p>
 
+            {/* Inside the box, which stays open on failure -- closing it
+                would hide the reason behind the page it was covering. */}
+            {failure("cancel")}
+
             <div className="row-actions">
               <button
                 type="button"
                 className="btn danger"
                 disabled={busy}
-                onClick={() => void act("cancel").then(() => setCancelling(false))}
+                onClick={() =>
+                  void act("cancel").then((ok) => {
+                    if (ok) setCancelling(false);
+                  })
+                }
               >
                 {busy ? "Cancelling…" : "Yes, cancel it"}
               </button>

@@ -47,7 +47,9 @@ export default function OrderTracker({
   onChanged,
 }: OrderTrackerProps) {
   const [busyId, setBusyId] = useState<number | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
+  // Which stage's tick failed, so the reason shows on that card -- not under
+  // the summary, a long scroll above the stage she just tapped.
+  const [problem, setProblem] = useState<{ id: number; message: string } | null>(null);
 
   // Held locally so a tick lands instantly under her thumb. The reload that
   // follows is what makes it true; this is only what she sees meanwhile.
@@ -84,7 +86,7 @@ export default function OrderTracker({
     } catch (error: unknown) {
       // Put it back. A tick that did not save must not keep looking saved.
       setLocal((existing) => ({ ...existing, [step.id]: !next }));
-      setProblem(errorMessage(error));
+      setProblem({ id: step.id, message: errorMessage(error) });
     } finally {
       setBusyId(null);
     }
@@ -110,8 +112,6 @@ export default function OrderTracker({
         </div>
       </header>
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
-
       <ol className="stages">
         {view.map((step) => {
           const state: StageState = step.complete
@@ -129,6 +129,7 @@ export default function OrderTracker({
               canTick={canTick}
               isTailor={isTailor}
               busy={busyId === step.id}
+              problem={problem?.id === step.id ? problem.message : null}
               onToggle={(next) => void toggle(step, next)}
               onChanged={onChanged}
             />
@@ -243,6 +244,8 @@ function ProgressRing({ done, total, complete }: { done: number; total: number; 
 /* ---- One stage ----------------------------------------------------------- */
 
 interface StageProps {
+  /** Why this stage's tick did not save, if it just failed. */
+  problem: string | null;
   orderId: number;
   step: OrderStep;
   state: StageState;
@@ -253,7 +256,17 @@ interface StageProps {
   onChanged: () => void;
 }
 
-function Stage({ orderId, step, state, canTick, isTailor, busy, onToggle, onChanged }: StageProps) {
+function Stage({
+  orderId,
+  step,
+  state,
+  canTick,
+  isTailor,
+  busy,
+  problem,
+  onToggle,
+  onChanged,
+}: StageProps) {
   const { objectUrl } = useAttachment(step.voice_note_url);
   const photos = step.photos ?? [];
 
@@ -336,6 +349,9 @@ function Stage({ orderId, step, state, canTick, isTailor, busy, onToggle, onChan
             {busy ? "Saving…" : "Mark as done"}
           </button>
         ) : null}
+
+        {/* On the card she tapped, under her thumb. */}
+        {problem ? <p className="notice bad">{problem}</p> : null}
       </div>
     </li>
   );

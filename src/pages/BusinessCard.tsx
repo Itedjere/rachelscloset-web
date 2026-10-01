@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import { api, errorMessage } from "../lib/api";
 import { drawBusinessCard, type CardTheme } from "../lib/businessCard";
 import type { BusinessCardData } from "../types/api";
@@ -23,6 +24,7 @@ export default function BusinessCard() {
   const [theme, setTheme] = useState<CardTheme>("light");
   const [loading, setLoading] = useState(true);
   const [problem, setProblem] = useState<string | null>(null);
+  const [saveProblem, setSaveProblem] = useState<"front" | "back" | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,11 +58,13 @@ export default function BusinessCard() {
   }, [render]);
 
   function save(which: "front" | "back") {
+    setSaveProblem(null);
     const canvas = which === "front" ? frontRef.current : backRef.current;
     if (!canvas || !card) return;
 
     canvas.toBlob((blob) => {
-      if (!blob) return setProblem("That did not work. Try again.");
+      // Under the side she tried to save, where "Saved." would have appeared.
+      if (!blob) return setSaveProblem(which);
 
       // An object URL and a synthetic click: no library, and the file lands
       // in her downloads where WhatsApp can pick it up.
@@ -133,6 +137,7 @@ export default function BusinessCard() {
             Save the front
           </button>
           {saved === "front" ? <p className="notice">Saved. Look in your downloads.</p> : null}
+          <ActionProblem message={saveProblem === "front" ? "That did not work. Try again." : null} />
         </div>
 
         <div className="card card-preview">
@@ -142,6 +147,7 @@ export default function BusinessCard() {
             Save the back
           </button>
           {saved === "back" ? <p className="notice">Saved. Look in your downloads.</p> : null}
+          <ActionProblem message={saveProblem === "back" ? "That did not work. Try again." : null} />
         </div>
       </div>
 

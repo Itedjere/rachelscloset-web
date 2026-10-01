@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { api, errorMessage } from "../lib/api";
 import type { NotificationGroup, Preferences } from "../types/api";
@@ -49,7 +50,10 @@ export default function AlertSettings() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // The switches' own (loading them, saving one), and a device removal's --
+  // each shown in its own card rather than at the top of the page.
   const [problem, setProblem] = useState<string | null>(null);
+  const [deviceProblem, setDeviceProblem] = useState<string | null>(null);
 
   const loadDevices = useCallback(async () => {
     try {
@@ -94,11 +98,13 @@ export default function AlertSettings() {
   }
 
   async function forget(id: number) {
+    setDeviceProblem(null);
+
     try {
       await api.delete(`/push/subscriptions?id=${id}`);
       setDevices((current) => current.filter((device) => device.id !== id));
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setDeviceProblem(errorMessage(error));
     }
   }
 
@@ -110,9 +116,6 @@ export default function AlertSettings() {
         <h1>Alerts</h1>
         <p>What your phone tells you, and when.</p>
       </div>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
-      {pushProblem ? <p className="notice bad">{pushProblem}</p> : null}
 
       <div className="card" style={{ marginBottom: 16 }}>
         <h2 style={{ fontSize: 18 }}>This device</h2>
@@ -129,6 +132,8 @@ export default function AlertSettings() {
             {busy ? "Turning off…" : "Turn off on this device"}
           </button>
         ) : null}
+
+        <ActionProblem message={pushProblem} />
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>
@@ -165,6 +170,7 @@ export default function AlertSettings() {
         ))}
 
         {saved ? <p className="notice info">Saved.</p> : null}
+        <ActionProblem message={problem} />
       </div>
 
       {devices.length > 0 ? (
@@ -179,6 +185,8 @@ export default function AlertSettings() {
               </button>
             </div>
           ))}
+
+          <ActionProblem message={deviceProblem} />
         </div>
       ) : null}
     </>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../components/ActionProblem";
 import Avatar from "../components/Avatar";
 import { api, errorMessage } from "../lib/api";
 import type { MeasurementAccessRow } from "../types/api";
@@ -20,7 +21,9 @@ export default function MeasurementAccess() {
   const [rows, setRows] = useState<MeasurementAccessRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
+  // Loading only; a failed tap shows on the tailor's own row.
   const [problem, setProblem] = useState<string | null>(null);
+  const [rowProblem, setRowProblem] = useState<{ id: number; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -41,13 +44,13 @@ export default function MeasurementAccess() {
     if (row.id === null) return;
 
     setBusyId(row.id);
-    setProblem(null);
+    setRowProblem(null);
 
     try {
       await api.post(`/measurement-access/${row.id}/${row.granted ? "revoke" : "grant"}`);
       await load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setRowProblem({ id: row.id, message: errorMessage(error) });
     } finally {
       setBusyId(null);
     }
@@ -108,6 +111,8 @@ export default function MeasurementAccess() {
                   We cannot take back what she has already written down.
                 </p>
               ) : null}
+
+              <ActionProblem message={rowProblem?.id === row.id ? rowProblem.message : null} />
             </div>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../../components/ActionProblem";
 import Avatar from "../../components/Avatar";
 import { api, errorMessage } from "../../lib/api";
 import { longDate } from "../../lib/format";
@@ -20,7 +21,10 @@ export default function People() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
+  // Loading only; a failed action shows on that person's card (or in the
+  // pause box, which stays open over the page when it fails).
   const [problem, setProblem] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ id: number; message: string } | null>(null);
   const [confirming, setConfirming] = useState<AdminUser | null>(null);
   const [resetFor, setResetFor] = useState<AdminUser | null>(null);
   const [issued, setIssued] = useState<PinResetIssue | null>(null);
@@ -57,7 +61,7 @@ export default function People() {
    */
   async function issueReset(user: AdminUser) {
     setBusyId(user.id);
-    setProblem(null);
+    setFailed(null);
     setIssued(null);
 
     try {
@@ -65,7 +69,7 @@ export default function People() {
       setResetFor(user);
       setIssued(response.data);
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ id: user.id, message: errorMessage(error) });
     } finally {
       setBusyId(null);
     }
@@ -73,14 +77,14 @@ export default function People() {
 
   async function act(user: AdminUser, path: string, body?: unknown) {
     setBusyId(user.id);
-    setProblem(null);
+    setFailed(null);
 
     try {
       await api.post(`/admin/users/${user.id}/${path}`, body);
       setConfirming(null);
       await load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ id: user.id, message: errorMessage(error) });
     } finally {
       setBusyId(null);
     }
@@ -191,6 +195,8 @@ export default function People() {
                   </button>
                 )}
               </div>
+
+              <ActionProblem message={failed?.id === user.id && !confirming ? failed.message : null} />
             </div>
           ))}
         </div>
@@ -215,6 +221,7 @@ export default function People() {
           busy={busyId === confirming.id}
           onCancel={() => setConfirming(null)}
           onConfirm={(days, reason) => void act(confirming, "suspend", { days, reason })}
+          problem={failed?.id === confirming.id ? failed.message : null}
         />
       ) : null}
     </>
@@ -224,11 +231,14 @@ export default function People() {
 function PauseDialog({
   user,
   busy,
+  problem,
   onCancel,
   onConfirm,
 }: {
   user: AdminUser;
   busy: boolean;
+  /** Why pausing failed -- shown in here, since this box stays open over the page. */
+  problem: string | null;
   onCancel: () => void;
   onConfirm: (days: number, reason: string | null) => void;
 }) {
@@ -264,6 +274,8 @@ function PauseDialog({
             maxLength={500}
           />
         </label>
+
+        <ActionProblem message={problem} />
 
         <div className="row-actions">
           <button
