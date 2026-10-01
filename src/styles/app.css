@@ -4245,3 +4245,31 @@ button.stage__tick:not(:disabled):active .stage__mark {
     transform: none;
   }
 }
+
+/* Back and Next, one row. Next is the wide one -- it is what she taps -- and
+   Back stays small but full height, so it is never mis-tapped for it. */
+.auth-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.auth-nav__back {
+  flex: none;
+  min-height: 52px;
+  border-radius: var(--radius);
+}
+
+.auth-nav__next {
+  flex: 1;
+}
+
+/* Coming back to step one, the choice she made is still marked. */
+.role-card.is-chosen {
+  border-color: var(--plum);
+  background: var(--plum-tint);
+}
+
+[data-theme="dark"] .role-card.is-chosen {
+  background: var(--surface-2);
+}
