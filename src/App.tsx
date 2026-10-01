@@ -141,20 +141,22 @@ export default function App() {
           }
         />
 
+        {/* Not for customers: the catalogue an admin curates and a tailor
+            arranges her stages within. A customer's stages are on her order. */}
         <Route
           path="/garments"
           element={
-            <ProtectedRoute>
+            <RoleRoute allow={["tailor", "admin"]}>
               <Garments />
-            </ProtectedRoute>
+            </RoleRoute>
           }
         />
         <Route
           path="/garments/:garmentTypeId/steps"
           element={
-            <ProtectedRoute>
+            <RoleRoute allow={["tailor", "admin"]}>
               <Arrangement />
-            </ProtectedRoute>
+            </RoleRoute>
           }
         />
         <Route

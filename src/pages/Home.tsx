@@ -58,15 +58,18 @@ export default function Home() {
           </p>
         </Link>
 
-        <Link className="tile" to="/garments">
-          <Icon name="garment" size={22} />
-          <h2>Garments</h2>
-          <p>
-            {isAdmin
-              ? "What customers can order, and the stages each one goes through."
-              : "See the stages of each garment, and put them in the order you work."}
-          </p>
-        </Link>
+        {/* Not a customer's page -- the route refuses her too. */}
+        {isAdmin || isTailor ? (
+          <Link className="tile" to="/garments">
+            <Icon name="garment" size={22} />
+            <h2>Garments</h2>
+            <p>
+              {isAdmin
+                ? "What customers can order, and the stages each one goes through."
+                : "See the stages of each garment, and put them in the order you work."}
+            </p>
+          </Link>
+        ) : null}
 
         {isAdmin ? (
           <Link className="tile" to="/admin/steps">
