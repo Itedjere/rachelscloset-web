@@ -37,7 +37,7 @@ export default function ForgotPin() {
       {/* Said first, because "just tell me what it was" is the natural
           question, and the answer is why a phone call is needed at all. */}
       <p className="hint">
-        Nobody can look up your PIN, not even Rachel's Closet. Ring them, and they will check it
+        Nobody can look up your PIN, not even Rachels Closet. Ring them, and they will check it
         is you and give you six numbers to choose a new one.
       </p>
 
@@ -60,7 +60,7 @@ export default function ForgotPin() {
         </div>
       ) : (
         <p className="notice info">
-          Contact Rachel's Closet and ask for six numbers to reset your PIN.
+          Contact Rachels Closet and ask for six numbers to reset your PIN.
         </p>
       )}
 

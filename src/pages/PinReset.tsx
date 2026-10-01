@@ -112,7 +112,7 @@ export default function PinReset() {
     return (
       <div className="card auth-card">
         <p className="hint">Step 1 of 2</p>
-        <h1>Rachel's Closet gave you six numbers</h1>
+        <h1>Rachels Closet gave you six numbers</h1>
         <p className="hint">Type your phone number, then the six numbers you were given.</p>
 
 

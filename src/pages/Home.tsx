@@ -95,7 +95,7 @@ export default function Home() {
           <Link className="tile" to="/settings/bank">
             <Icon name="check" size={22} />
             <h2>Where you get paid</h2>
-            <p>Where Rachel's Closet sends your money once an order is finished.</p>
+            <p>Where Rachels Closet sends your money once an order is finished.</p>
           </Link>
         ) : null}
 

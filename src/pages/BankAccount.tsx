@@ -104,7 +104,7 @@ export default function BankAccount() {
     <>
       <div className="page-head">
         <h1>Where you get paid</h1>
-        <p>Only needed for orders where Rachel's Closet keeps the money until your customer collects.</p>
+        <p>Only needed for orders where Rachels Closet keeps the money until your customer collects.</p>
       </div>
 
       {stored?.verified ? (

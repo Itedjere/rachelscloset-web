@@ -131,7 +131,7 @@ function drawFront(ctx: CanvasRenderingContext2D, card: BusinessCardData, p: Pal
   ctx.textAlign = "left";
   ctx.fillStyle = p.ink;
   ctx.font = `600 28px "Zilla Slab", Georgia, serif`;
-  ctx.fillText("Rachel’s Closet", PAD, HEIGHT - PAD - 26);
+  ctx.fillText("Rachels Closet", PAD, HEIGHT - PAD - 26);
 
   ctx.fillStyle = p.muted;
   ctx.font = `400 20px Monda, system-ui, sans-serif`;

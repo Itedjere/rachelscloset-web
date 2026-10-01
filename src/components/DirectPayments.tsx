@@ -10,7 +10,7 @@ import MoneyInput from "./MoneyInput";
 /**
  * Money handed over by hand, on a direct order.
  *
- * Nothing on a direct order passes through Rachel's Closet -- the customer pays
+ * Nothing on a direct order passes through Rachels Closet -- the customer pays
  * her tailor in cash, by transfer or at a POS -- so the tailor says what she
  * was given and the customer is sent a receipt for it. This shows the list to
  * both of them, and to the tailor the way to add to it.

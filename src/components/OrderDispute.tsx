@@ -96,15 +96,15 @@ export default function OrderDispute({
         <p className="dispute__reason">“{dispute.reason}”</p>
         <p className="hint">
           {dispute.opened_by_staff
-            ? "Written down by Rachel's Closet during a phone call."
+            ? "Written down by Rachels Closet during a phone call."
             : `Raised by ${dispute.raised_by?.name ?? "the customer"}.`}
         </p>
 
         {dispute.status === "open" ? (
           <p className="notice">
             {isTailor
-              ? "Your money for this order stays with Rachel's Closet until somebody has spoken to you both. Expect a call."
-              : "Your money stays with Rachel's Closet until somebody has spoken to you and your tailor. Expect a call."}
+              ? "Your money for this order stays with Rachels Closet until somebody has spoken to you both. Expect a call."
+              : "Your money stays with Rachels Closet until somebody has spoken to you and your tailor. Expect a call."}
           </p>
         ) : (
           <Outcome dispute={dispute} isTailor={isTailor} />
@@ -122,7 +122,7 @@ export default function OrderDispute({
     <div className="card" style={{ marginBottom: 16 }}>
       <h2 style={{ fontSize: 18 }}>Is something wrong with this order?</h2>
       <p className="hint">
-        Tell Rachel's Closet. The money stays put until somebody has called you both.
+        Tell Rachels Closet. The money stays put until somebody has called you both.
       </p>
 
       {open ? (

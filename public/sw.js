@@ -25,10 +25,10 @@ self.addEventListener("push", (event) => {
     payload = event.data ? event.data.json() : {};
   } catch {
     // A malformed message still deserves to say something rather than nothing.
-    payload = { title: "Rachel's Closet", body: "You have a new message." };
+    payload = { title: "Rachels Closet", body: "You have a new message." };
   }
 
-  const title = payload.title || "Rachel's Closet";
+  const title = payload.title || "Rachels Closet";
 
   event.waitUntil(
     self.registration.showNotification(title, {

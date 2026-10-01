@@ -79,7 +79,7 @@ export default function AdminOrderDetail() {
             <dd>{naira(order.paid_total)}</dd>
           </div>
           <div>
-            <dt>Held by Rachel's Closet</dt>
+            <dt>Held by Rachels Closet</dt>
             <dd>{order.escrow ? "Yes" : "No — paid direct to the tailor"}</dd>
           </div>
           {order.payout ? (

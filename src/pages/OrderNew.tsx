@@ -289,7 +289,7 @@ export default function OrderNew() {
               <div className="label">Hold the money until she collects</div>
               <div className="hint">
                 {escrow
-                  ? "She pays Rachel's Closet, which keeps it and pays you when the garment is handed over. Costs you nothing."
+                  ? "She pays Rachels Closet, which keeps it and pays you when the garment is handed over. Costs you nothing."
                   : "Off: she pays you herself — cash, transfer or POS — and you mark it paid here."}
               </div>
             </div>

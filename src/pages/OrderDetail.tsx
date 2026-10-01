@@ -182,8 +182,8 @@ export default function OrderDetail() {
             <dd>
               {order.escrow
                 ? isTailor
-                  ? "Rachel's Closet is keeping it until she has the clothes"
-                  : "Rachel's Closet is keeping it until you have your clothes"
+                  ? "Rachels Closet is keeping it until she has the clothes"
+                  : "Rachels Closet is keeping it until you have your clothes"
                 : isTailor
                   ? "Paid straight to you"
                   : "Paid straight to your tailor"}
@@ -193,7 +193,7 @@ export default function OrderDetail() {
 
         {/*
           Only the customer pays, only while something is outstanding, and
-          only on an order Rachel's Closet holds the money for. On a direct
+          only on an order Rachels Closet holds the money for. On a direct
           order this button used to charge her into the PLATFORM's account,
           with nothing recorded as owed to the tailor.
         */}
@@ -309,7 +309,7 @@ export default function OrderDetail() {
         <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Has it reached you?</h2>
           <p className="hint">
-            Your tailor posted this one to you. Tap here when it reaches you, and Rachel's
+            Your tailor posted this one to you. Tap here when it reaches you, and Rachels
             Closet starts counting the few days before she is paid.
           </p>
           <button type="button" className="btn" onClick={() => void act("received")} disabled={busy}>
@@ -328,7 +328,7 @@ export default function OrderDetail() {
         <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Is everything right?</h2>
           <p className="hint">
-            Saying yes sends your tailor her money straight away. If you say nothing, Rachel's
+            Saying yes sends your tailor her money straight away. If you say nothing, Rachels
             Closet sends it to her after a few days anyway.
           </p>
           <button type="button" className="btn" onClick={() => void act("confirm")} disabled={busy}>
@@ -425,8 +425,8 @@ export default function OrderDetail() {
             <p className="hint">
               {/* Nobody is told by the platform, so she is reminded to say it herself. */}
               {isTailor
-                ? `It cannot be undone. To make it after all, you would open a new order. Nothing has been paid, so no money moves. Rachel's Closet does not tell ${other?.name ?? "your customer"} — let her know yourself.`
-                : `It cannot be undone. Nothing has been paid, so no money moves. Rachel's Closet does not tell ${other?.name ?? "your tailor"} — let her know yourself.`}
+                ? `It cannot be undone. To make it after all, you would open a new order. Nothing has been paid, so no money moves. Rachels Closet does not tell ${other?.name ?? "your customer"} — let her know yourself.`
+                : `It cannot be undone. Nothing has been paid, so no money moves. Rachels Closet does not tell ${other?.name ?? "your tailor"} — let her know yourself.`}
             </p>
 
             {/* Inside the box, which stays open on failure -- closing it
