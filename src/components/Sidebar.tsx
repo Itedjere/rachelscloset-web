@@ -60,17 +60,29 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    /*
+     * A section of its own, not two lines buried in Account. Her body's
+     * numbers and who may read them are the most sensitive things she has
+     * here, and the second link only makes sense next to the first. A
+     * tailor reaches a customer's measurements through the order instead,
+     * so the whole group disappears for her.
+     */
+    heading: "Measurements",
+    items: [
+      { to: "/measurements", label: "Your measurements", icon: "ruler", allow: ["customer"] },
+      {
+        to: "/settings/measurement-access",
+        label: "Who can see them",
+        icon: "lock",
+        allow: ["customer"],
+      },
+    ],
+  },
+  {
     heading: "Account",
     items: [
       { to: "/notifications", label: "Notifications", icon: "bell" },
       { to: "/profile", label: "Your details", icon: "user" },
-      { to: "/measurements", label: "Your measurements", icon: "ruler", allow: ["customer"] },
-      {
-        to: "/settings/measurement-access",
-        label: "Who can see your measurements",
-        icon: "lock",
-        allow: ["customer"],
-      },
       { to: "/settings/bank", label: "Where you get paid", icon: "check", allow: ["tailor"] },
       { to: "/settings/alerts", label: "Alerts", icon: "cog" },
     ],
