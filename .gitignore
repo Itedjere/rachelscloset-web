@@ -28,3 +28,6 @@ dist-ssr
 # Local environment overrides. .env.example is committed; this is not.
 .env
 .env.local
+
+# Where deploy.sh uploads to: names the server and the cPanel user.
+.deploy.env

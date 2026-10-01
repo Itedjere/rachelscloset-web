@@ -1,0 +1,49 @@
+# The app on shared hosting (Apache). Vite copies this file into dist/ as is.
+#
+# The app is one index.html and its scripts; every address in it -- /orders/12,
+# /join, /settings/alerts -- is drawn in the browser. Apache does not know
+# that, so without this a refresh, a bookmark or a notification tapped on a
+# lock screen asks the server for a file called /orders/12 and gets a 404.
+
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Always https. Web push and the service worker refuse plain http.
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # A real file or folder is served as itself...
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ...and every other address is the app, which draws the page itself.
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+# A manifest Apache does not recognise is served as text/plain, and some
+# phones then refuse "add to home screen" -- which on an iPhone is the only
+# way web push works at all.
+AddType application/manifest+json .webmanifest
+
+<IfModule mod_headers.c>
+    # Never cached: index.html names the current scripts, and sw.js is how a
+    # phone learns there is a new version. A cached copy of either keeps a
+    # phone on the old app until somebody clears it by hand.
+    <FilesMatch "^(index\.html|sw\.js|site\.webmanifest)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+
+    # Everything Vite builds has a content hash in its name, so a changed
+    # file is a new name and the old one can be cached for a year. That is
+    # most of the bytes, on metered connections.
+    <If "%{REQUEST_URI} =~ m#^/assets/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+</IfModule>
