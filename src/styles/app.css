@@ -1398,161 +1398,401 @@ a {
 }
 
 /* ---------------------------------------------------------------------------
-   The production tracker (Section 9)
+   The production tracker (Sections 9, 10)
 
-   The one screen the whole platform is for. Built for a thumb on a five-inch
-   screen in a workshop: the tick is a 48px circle, not a checkbox, and the
-   voice note sits on the row rather than behind a tap.
+   The one screen the whole platform is for, read in one glance: a summary
+   that says how far, what is happening now and when anything last happened,
+   then one card per stage on a line. Built for a thumb on a five-inch screen
+   in a workshop -- every mark is a 48px circle, at every width -- and for a
+   reader who may not read: state is carried by shape and colour (a filled
+   tick, a lit card, a dashed future) before it is carried by words.
    --------------------------------------------------------------------------- */
 
-.tracker-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.tracker-head h2 {
-  font-size: 18px;
-  margin: 0;
-}
-
-.tracker-head strong {
-  font-variant-numeric: tabular-nums;
-  color: var(--plum);
-}
-
-.tracker-bar {
-  height: 8px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+.tracker {
+  /* The summary band and the stage list pad themselves, so the band can run
+     edge to edge. */
+  padding: 0;
   overflow: hidden;
 }
 
-.tracker-bar span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--plum), var(--gold));
-  /* Slow enough to be seen as movement, which is the acknowledgement of a tap. */
-  transition: width 0.4s ease;
+.tracker > .notice {
+  margin: 14px 20px 0;
 }
 
-.tracker-steps {
-  list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
-}
+/* ---- The summary ---------------------------------------------------------- */
 
-.tracker-step {
+.tracker-summary {
   display: flex;
-  /* Top, not centre. A stage with three lines of instructions is a tall row,
-     and a centred circle drifts far enough from its label to stop reading as
-     belonging to it -- measured at 55px on a phone. */
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
+  align-items: center;
+  gap: 18px;
+  padding: 22px 20px;
+  background: linear-gradient(135deg, var(--plum-tint), var(--surface) 72%);
+  border-bottom: 1px solid var(--line);
 }
 
-.tracker-step:first-child {
-  border-top: 0;
-  padding-top: 4px;
-}
-
-.tracker-body {
+.tracker-summary__text {
   min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  /* Drops the label's first line onto the circle's centre line. */
-  padding-top: 12px;
 }
 
-.tracker-body strong {
-  font-size: 16px;
-  line-height: 1.35;
+.tracker-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--plum);
 }
 
-.tracker-step.done .tracker-body strong {
+.tracker-headline {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.tracker-sub {
+  margin: 6px 0 0;
+  font-size: 14px;
   color: var(--ink-soft);
 }
 
-.tracker-body .hint {
-  margin: 0;
+/* The ring: how far, with the count in the middle. */
+.ring {
+  position: relative;
+  flex: none;
+  width: 88px;
+  height: 88px;
 }
 
-/* The mark is the state: a number before, a tick after. */
-.tracker-mark {
-  flex: none;
+.ring svg {
+  width: 100%;
+  height: 100%;
+  /* Starts at twelve o'clock, as a clock-face reader expects. */
+  transform: rotate(-90deg);
+}
+
+.ring__track,
+.ring__fill {
+  fill: none;
+  stroke-width: 7;
+}
+
+.ring__track {
+  stroke: var(--line);
+}
+
+.ring__fill {
+  stroke: var(--plum);
+  stroke-linecap: round;
+  /* Slow enough to be seen moving, which is the acknowledgement of a tap. */
+  transition: stroke-dasharray 0.6s ease;
+}
+
+.ring.is-complete .ring__fill {
+  stroke: var(--success);
+}
+
+.ring__count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.ring__count strong {
+  font-family: "Zilla Slab", Georgia, serif;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.ring__count span {
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+/* ---- The stages ----------------------------------------------------------- */
+
+.stages {
+  list-style: none;
+  margin: 0;
+  padding: 22px 20px 10px;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  column-gap: 14px;
+  padding-bottom: 16px;
+}
+
+/*
+ * The line joining this stage to the next. Solid green once this stage is
+ * finished, dashed while it is still to do: the garment's journey is a shape
+ * before it is any words. Drawn per stage rather than once down the list,
+ * so each segment can take its own stage's state.
+ */
+.stage::before {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 52px;
+  bottom: 4px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--line-strong) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.stage.is-done::before {
+  background: var(--success);
+}
+
+/* The last stage is the end of the line; nothing hangs below it. */
+.stage:last-child::before {
+  display: none;
+}
+
+/* The mark, and the button that holds it for the tailor. */
+.stage__tick {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  line-height: 0;
+}
+
+button.stage__tick {
+  cursor: pointer;
+}
+
+button.stage__tick:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 3px;
+}
+
+button.stage__tick:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.stage__mark {
+  display: grid;
+  place-items: center;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 17px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
   border: 2px solid var(--line-strong);
   background: var(--surface);
   color: var(--ink-mute);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
   transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.12s ease;
 }
 
-.tracker-mark.done {
+.stage.is-done .stage__mark {
   border-color: var(--success);
   background: var(--success);
   color: #ffffff;
 }
 
-/* A button only for the tailor, so the customer's copy has nothing that
-   looks pressable and does nothing. */
-.tracker-tick {
-  flex: none;
-  /* Without this the button stretches to the row and re-centres the circle
-     inside itself, undoing the alignment above. */
-  align-self: flex-start;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  border-radius: 50%;
-  line-height: 0;
+/* Where she is: ringed and lit, and gently breathing so the eye finds it. */
+.stage.is-current .stage__mark {
+  border-color: var(--plum);
+  background: var(--plum-tint);
+  color: var(--plum);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--plum) 14%, transparent);
+  animation: stage-breathe 2.4s ease-in-out infinite;
 }
 
-.tracker-tick:focus-visible {
-  outline: 2px solid var(--plum);
-  outline-offset: 3px;
+@keyframes stage-breathe {
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--plum) 6%, transparent);
+  }
 }
 
-.tracker-tick:disabled {
-  opacity: 0.55;
-  cursor: progress;
-}
-
-.tracker-tick:not(:disabled):hover .tracker-mark {
+button.stage__tick:not(:disabled):hover .stage__mark {
   border-color: var(--plum);
   color: var(--plum);
 }
 
-.tracker-tick:not(:disabled):hover .tracker-mark.done {
+.stage.is-done button.stage__tick:not(:disabled):hover .stage__mark {
   border-color: var(--success);
   color: #ffffff;
+  filter: brightness(1.08);
 }
 
-.tracker-tick:not(:disabled):active .tracker-mark {
-  transform: scale(0.93);
+button.stage__tick:not(:disabled):active .stage__mark {
+  transform: scale(0.92);
+}
+
+/* The card. */
+.stage__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px 16px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.stage.is-current .stage__card {
+  border-color: var(--plum);
+  background: linear-gradient(180deg, var(--plum-tint), var(--surface) 65%);
+  box-shadow: var(--shadow);
+}
+
+/* Still to come: quieter, and dashed like the line that leads to it. */
+.stage.is-upcoming .stage__card {
+  border-style: dashed;
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.stage__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 10px;
+  /* The label's first line sits on the mark's centre line. */
+  min-height: 22px;
+}
+
+.stage__label {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.stage.is-upcoming .stage__label {
+  color: var(--ink-soft);
+}
+
+.stage__badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--plum);
+  /* --bg rather than white: the plum lightens in dark mode, and white on it
+     would wash out. */
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage__when {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.stage__instructions {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.stage__finish {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  /* One line, always: a wrapped action label in a big button reads as two
+     buttons to somebody scanning shapes rather than words. */
+  white-space: nowrap;
+}
+
+.tracker-foot {
+  margin: 0;
+  padding: 0 20px 18px;
+}
+
+/* A phone: everything a little tighter, nothing smaller to tap. */
+@media (max-width: 560px) {
+  .tracker-summary {
+    gap: 14px;
+    padding: 18px 16px;
+  }
+
+  .ring {
+    width: 72px;
+    height: 72px;
+  }
+
+  .ring__count strong {
+    font-size: 23px;
+  }
+
+  .tracker-headline {
+    font-size: 19px;
+  }
+
+  /* Tighter gutters, never a smaller mark: measured at a 310px viewport the
+     card was left 175px, and the room has to come from spacing, not from the
+     48px a thumb needs. */
+  .stages {
+    padding: 18px 10px 6px;
+  }
+
+  .stage {
+    column-gap: 8px;
+  }
+
+  .stage__card {
+    padding: 12px;
+  }
+
+  /* Full width under a thumb. */
+  .stage__finish {
+    align-self: stretch;
+    justify-content: center;
+    padding: 0 12px;
+  }
+
+  .tracker-foot {
+    padding: 0 16px 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tracker-bar span,
-  .tracker-mark {
+  .ring__fill,
+  .stage__mark,
+  .stage__card {
     transition: none;
+  }
+
+  .stage.is-current .stage__mark {
+    animation: none;
   }
 }
 

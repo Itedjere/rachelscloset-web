@@ -212,6 +212,8 @@ export default function OrderDetail() {
         <OrderTracker
           orderId={order.id}
           steps={order.steps}
+          status={order.status}
+          isTailor={isTailor}
           canTick={isTailor && (order.status === "in_progress" || order.status === "ready")}
           onChanged={() => void load()}
         />
