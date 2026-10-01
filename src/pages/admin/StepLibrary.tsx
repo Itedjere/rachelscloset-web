@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import ActionProblem from "../../components/ActionProblem";
 import AudioPlayer from "../../components/AudioPlayer";
-import VoiceNoteRecorder from "../../components/VoiceNoteRecorder";
+import StepForm from "../../components/StepForm";
 import { useAttachment } from "../../hooks/useAttachment";
-import { useUploadLimit } from "../../hooks/useUploadLimit";
 import { api, errorMessage } from "../../lib/api";
 import type { LibraryStep, ResourceResponse } from "../../types/api";
 
@@ -105,12 +105,18 @@ function StepRow({
 }) {
   const { objectUrl } = useAttachment(step.voice_note_url);
   const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
 
   async function retire(retired: boolean) {
     setBusy(true);
+    setProblem(null);
+
     try {
       await api.post(`/admin/steps/${step.id}/retire`, { retired });
       onChanged();
+    } catch (error: unknown) {
+      // It had no catch at all: a failed retire simply did nothing.
+      setProblem(errorMessage(error));
     } finally {
       setBusy(false);
     }
@@ -139,96 +145,8 @@ function StepRow({
           {step.retired ? "Bring back" : "Retire"}
         </button>
       </div>
+
+      <ActionProblem message={problem} />
     </article>
-  );
-}
-
-/* ------------------------------------------------------------------------ */
-
-function StepForm({
-  step,
-  onDone,
-  onCancel,
-}: {
-  step: LibraryStep;
-  onDone: () => void;
-  onCancel: () => void;
-}) {
-  const limit = useUploadLimit();
-  const [label, setLabel] = useState(step.label);
-  const [instructions, setInstructions] = useState(step.instructions ?? "");
-  const [note, setNote] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
-
-  const isNew = step.id === 0;
-
-  async function save(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setProblem(null);
-
-    try {
-      const body = { label, instructions };
-
-      const saved = isNew
-        ? await api.post<ResourceResponse<LibraryStep>>("/admin/steps", body)
-        : await api.put<ResourceResponse<LibraryStep>>(`/admin/steps/${step.id}`, body);
-
-      if (note) {
-        const form = new FormData();
-        form.append("voice_note", note);
-        await api.post(`/admin/steps/${saved.data.id}/voice-note`, form);
-      }
-
-      onDone();
-    } catch (error: unknown) {
-      setProblem(errorMessage(error));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form className="card" onSubmit={save} style={{ marginBottom: 16 }}>
-      <h2 style={{ fontSize: 18 }}>{isNew ? "New step" : `Edit ${step.label}`}</h2>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
-
-      <div className="field">
-        <label htmlFor="label">What is this stage called?</label>
-        <input id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
-      </div>
-
-      <div className="field">
-        <label htmlFor="instructions">Notes for the tailor</label>
-        <input
-          id="instructions"
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-        />
-        <p className="hint">Written notes are a convenience. The recording below is what most people will use.</p>
-      </div>
-
-      <div className="field">
-        <label>Say what this step means</label>
-        <VoiceNoteRecorder value={note} onChange={setNote} limit={limit} />
-        {!isNew && step.voice_note_url ? (
-          <p className="hint">
-            This step already has a recording. Adding a new one replaces it going forward — orders
-            already in progress keep the one they were given.
-          </p>
-        ) : null}
-      </div>
-
-      <div className="row-actions">
-        <button type="submit" className="btn" disabled={busy || label.trim() === ""}>
-          {busy ? "Saving…" : "Save"}
-        </button>
-        <button type="button" className="btn ghost" onClick={onCancel}>
-          Cancel
-        </button>
-      </div>
-    </form>
   );
 }

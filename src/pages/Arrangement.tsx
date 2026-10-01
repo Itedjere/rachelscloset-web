@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import ActionProblem from "../components/ActionProblem";
 import AudioPlayer from "../components/AudioPlayer";
+import StepForm from "../components/StepForm";
 import { useAttachment } from "../hooks/useAttachment";
 import { useAuth } from "../hooks/useAuth";
 import { useReorder } from "../hooks/useReorder";
@@ -43,7 +45,12 @@ export default function ArrangementPage() {
   const [library, setLibrary] = useState<LibraryStep[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // Loading only; a failed save shows by the control that made it.
   const [problem, setProblem] = useState<string | null>(null);
+  // Admin only: the stage whose form is open under its row, or a new one.
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [failed, setFailed] = useState<{ at: "list" | "add" | "reset"; message: string } | null>(null);
 
   const isAdmin = user?.role === "admin";
 
@@ -74,10 +81,11 @@ export default function ArrangementPage() {
    * are the same request, it is idempotent, and there is no gap arithmetic to
    * get wrong — the server renumbers from one.
    */
-  async function commit(steps: ArrangedStep[]) {
+  /** `from` is where she did it, so a failure shows there and not at the top. */
+  async function commit(steps: ArrangedStep[], from: "list" | "add" = "list") {
     setArrangement((current) => (current ? { ...current, steps } : current));
     setSaving(true);
-    setProblem(null);
+    setFailed(null);
 
     try {
       const response = await api.put<ResourceResponse<Arrangement>>(
@@ -86,7 +94,7 @@ export default function ArrangementPage() {
       );
       setArrangement(response.data);
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: from, message: errorMessage(error) });
       void load();
     } finally {
       setSaving(false);
@@ -129,18 +137,20 @@ export default function ArrangementPage() {
 
   function add(step: LibraryStep) {
     if (!arrangement) return;
-    void commit([...arrangement.steps, { ...step, position: arrangement.steps.length + 1 }]);
+    void commit([...arrangement.steps, { ...step, position: arrangement.steps.length + 1 }], "add");
   }
 
   async function resetToDefault() {
     setSaving(true);
+    setFailed(null);
+
     try {
       const response = await api.delete<ResourceResponse<Arrangement>>(
         `/garment-types/${garmentTypeId}/steps`,
       );
       setArrangement(response.data);
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setFailed({ at: "reset", message: errorMessage(error) });
     } finally {
       setSaving(false);
     }
@@ -165,7 +175,6 @@ export default function ArrangementPage() {
         </p>
       </div>
 
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       {arrangement.steps.length === 0 ? (
         <p className="empty">No steps yet. Add some from the list below.</p>
@@ -175,8 +184,8 @@ export default function ArrangementPage() {
           ref={listRef as React.RefObject<HTMLOListElement>}
         >
           {order.map((step, index) => (
+            <Fragment key={step.id}>
             <StepCard
-              key={step.id}
               step={step}
               index={index}
               count={order.length}
@@ -187,10 +196,27 @@ export default function ArrangementPage() {
               onUp={() => move(index, -1)}
               onDown={() => move(index, 1)}
               onRemove={() => remove(step.id)}
+              onEdit={isAdmin ? () => setEditingId(editingId === step.id ? null : step.id) : undefined}
             />
+            {/* Under the stage it belongs to, not at the top of the page. */}
+            {isAdmin && editingId === step.id ? (
+              <li className="arrangement__editor">
+                <StepForm
+                  step={step}
+                  onDone={() => {
+                    setEditingId(null);
+                    void load();
+                  }}
+                  onCancel={() => setEditingId(null)}
+                />
+              </li>
+            ) : null}
+            </Fragment>
           ))}
         </ol>
       )}
+
+      <ActionProblem message={failed?.at === "list" ? failed.message : null} />
 
       {!isAdmin && arrangement.is_own ? (
         <div className="row-actions">
@@ -199,10 +225,36 @@ export default function ArrangementPage() {
           </button>
         </div>
       ) : null}
+      <ActionProblem message={failed?.at === "reset" ? failed.message : null} />
 
-      {unused.length > 0 ? (
+      {unused.length > 0 || isAdmin ? (
         <div className="card" style={{ marginTop: 24 }}>
           <h2 style={{ fontSize: 18 }}>Add a stage</h2>
+          {/*
+            A stage nobody has made yet, made here and added to this garment
+            in one go -- so an admin building the agbada's stages never has to
+            leave for the step library and come back.
+          */}
+          {isAdmin && !creating ? (
+            <button type="button" className="btn ghost" onClick={() => setCreating(true)} style={{ marginBottom: 12 }}>
+              + New stage
+            </button>
+          ) : null}
+          {isAdmin && creating ? (
+            <StepForm
+              step={{ id: 0, label: "", instructions: "", voice_note_url: null }}
+              title={`New stage for ${garment?.name ?? "this garment"}`}
+              onDone={(saved) => {
+                setCreating(false);
+                // Into the local library, then onto the garment. Not a full
+                // reload: racing the save, it could land an older order on top.
+                setLibrary((current) => [...current, saved]);
+                add(saved);
+              }}
+              onCancel={() => setCreating(false)}
+            />
+          ) : null}
+          {unused.length > 0 ? <p className="hint">Or add one that already exists:</p> : null}
           <div className="chip-row">
             {unused.map((step) => (
               <button key={step.id} type="button" className="chip" disabled={saving} onClick={() => add(step)}>
@@ -210,6 +262,7 @@ export default function ArrangementPage() {
               </button>
             ))}
           </div>
+          <ActionProblem message={failed?.at === "add" ? failed.message : null} />
         </div>
       ) : null}
     </>
@@ -229,6 +282,7 @@ function StepCard({
   onUp,
   onDown,
   onRemove,
+  onEdit,
 }: {
   step: ArrangedStep;
   index: number;
@@ -240,6 +294,8 @@ function StepCard({
   onUp: () => void;
   onDown: () => void;
   onRemove: () => void;
+  /** Admins only: record or change what this stage means. */
+  onEdit?: () => void;
 }) {
   const { objectUrl } = useAttachment(step.voice_note_url);
 
@@ -269,6 +325,12 @@ function StepCard({
         ) : (
           <span className="silent">No recording yet</span>
         )}
+        {/* A labelled button, not an icon: "record" is the whole job here. */}
+        {onEdit ? (
+          <button type="button" className="btn quiet arrangement__record" onClick={onEdit}>
+            {step.voice_note_url ? "Change recording or name" : "Record what it means"}
+          </button>
+        ) : null}
       </div>
 
       <div className="arrangement__arrows">

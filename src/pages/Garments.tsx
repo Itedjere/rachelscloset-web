@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import ActionProblem from "../components/ActionProblem";
 import { useAuth } from "../hooks/useAuth";
 import { useReorder } from "../hooks/useReorder";
 import { api, errorMessage } from "../lib/api";
@@ -18,19 +19,28 @@ export default function Garments() {
   const [types, setTypes] = useState<GarmentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  // Loading only; adding and reordering each show theirs beside the action.
   const [problem, setProblem] = useState<string | null>(null);
+  const [addProblem, setAddProblem] = useState<string | null>(null);
+  const [orderProblem, setOrderProblem] = useState<string | null>(null);
   const [name, setName] = useState("");
+  // Admin only.
+  const [showRetired, setShowRetired] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [rowProblem, setRowProblem] = useState<{ id: number; message: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const response = await api.get<ResourceResponse<GarmentType[]>>("/garment-types");
+      const response = await api.get<ResourceResponse<GarmentType[]>>(
+        `/garment-types${showRetired ? "?include_retired=1" : ""}`,
+      );
       setTypes(response.data);
     } catch (error: unknown) {
       setProblem(errorMessage(error));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showRetired]);
 
   useEffect(() => {
     void load();
@@ -45,6 +55,7 @@ export default function Garments() {
   async function commit(next: GarmentType[]) {
     setTypes(next);
     setBusy(true);
+    setOrderProblem(null);
 
     try {
       const response = await api.put<ResourceResponse<GarmentType[]>>("/admin/garment-types/reorder", {
@@ -52,7 +63,7 @@ export default function Garments() {
       });
       setTypes(response.data);
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setOrderProblem(errorMessage(error));
       void load();
     } finally {
       setBusy(false);
@@ -62,14 +73,34 @@ export default function Garments() {
   async function add(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setProblem(null);
+    setAddProblem(null);
 
     try {
       await api.post("/admin/garment-types", { name });
       setName("");
       void load();
     } catch (error: unknown) {
-      setProblem(errorMessage(error));
+      setAddProblem(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /*
+   * Retire, never delete -- the rule the step library already follows, for
+   * the same reason. Orders already made name this garment, and a tailor's
+   * own stage arrangement hangs off it; deleting would orphan both. Retired,
+   * it simply stops being offered for new orders, and "Bring back" undoes it.
+   */
+  async function retire(type: GarmentType) {
+    setBusy(true);
+    setRowProblem(null);
+
+    try {
+      await api.post(`/admin/garment-types/${type.id}/retire`, { retired: !type.retired });
+      await load();
+    } catch (error: unknown) {
+      setRowProblem({ id: type.id, message: errorMessage(error) });
     } finally {
       setBusy(false);
     }
@@ -125,7 +156,18 @@ export default function Garments() {
           <button type="submit" className="btn" disabled={busy || name.trim() === ""}>
             Add
           </button>
+          <ActionProblem message={addProblem} />
         </form>
+      ) : null}
+
+      {isAdmin ? (
+        <label className="switch-row" style={{ borderBottom: 0, marginBottom: 8 }}>
+          <div className="text">
+            <div className="label">Show retired garments</div>
+            <div className="hint">They are kept for the orders that already use them.</div>
+          </div>
+          <input type="checkbox" checked={showRetired} onChange={(e) => setShowRetired(e.target.checked)} />
+        </label>
       ) : null}
 
       {loading ? (
@@ -137,7 +179,7 @@ export default function Garments() {
         >
           {order.map((type, index) => (
             <li
-              className={`arrangement__step${draggingId === type.id ? " is-dragging" : ""}`}
+              className={`arrangement__step${draggingId === type.id ? " is-dragging" : ""}${type.retired ? " is-retired" : ""}`}
               key={type.id}
               style={rowStyle(type.id)}
             >
@@ -154,8 +196,23 @@ export default function Garments() {
               </span>
 
               <div className="arrangement__body">
-                <h3>{type.name}</h3>
-                {type.description ? <p className="hint">{type.description}</p> : null}
+                {isAdmin && editingId === type.id ? (
+                  <GarmentEditor
+                    garment={type}
+                    onSaved={() => {
+                      setEditingId(null);
+                      void load();
+                    }}
+                    onCancel={() => setEditingId(null)}
+                  />
+                ) : (
+                  <>
+                    <h3>{type.name}</h3>
+                    {type.description ? <p className="hint">{type.description}</p> : null}
+                    {type.retired ? <span className="silent">Retired — not offered on new orders</span> : null}
+                  </>
+                )}
+                <ActionProblem message={rowProblem?.id === type.id ? rowProblem.message : null} />
               </div>
 
               <div className="arrangement__arrows">
@@ -183,6 +240,22 @@ export default function Garments() {
                     >
                       ↓
                     </button>
+                    <button
+                      type="button"
+                      className="btn quiet"
+                      onClick={() => setEditingId(editingId === type.id ? null : type.id)}
+                      disabled={busy}
+                    >
+                      Rename
+                    </button>
+                    <button
+                      type="button"
+                      className="btn quiet"
+                      onClick={() => void retire(type)}
+                      disabled={busy}
+                    >
+                      {type.retired ? "Bring back" : "Retire"}
+                    </button>
                   </>
                 ) : null}
               </div>
@@ -190,6 +263,80 @@ export default function Garments() {
           ))}
         </ol>
       )}
+
+      {/* Under the list she was reordering, brought into view if it is off-screen. */}
+      <ActionProblem message={orderProblem} />
     </>
+  );
+}
+
+/**
+ * Renaming a garment, in place on its row.
+ *
+ * Unlike its stages, a garment's NAME is not copied onto an order: orders
+ * look it up. So a rename shows on every order already made with it too --
+ * right for fixing a spelling, wrong for turning "Kaftan" into something
+ * else. The form says so before she saves; to offer a different garment,
+ * add a new one and retire this.
+ */
+function GarmentEditor({
+  garment,
+  onSaved,
+  onCancel,
+}: {
+  garment: GarmentType;
+  onSaved: () => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(garment.name);
+  const [description, setDescription] = useState(garment.description ?? "");
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setProblem(null);
+
+    try {
+      await api.put(`/admin/garment-types/${garment.id}`, {
+        name: name.trim(),
+        description: description.trim() || null,
+      });
+      onSaved();
+    } catch (error: unknown) {
+      setProblem(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="garment-editor" onSubmit={save}>
+      <label className="field">
+        <span>Name</span>
+        <input value={name} onChange={(e) => setName(e.target.value)} autoFocus maxLength={120} />
+      </label>
+      <label className="field">
+        <span>A short description (optional)</span>
+        <input value={description} onChange={(e) => setDescription(e.target.value)} maxLength={255} />
+      </label>
+
+      <p className="hint" style={{ margin: 0 }}>
+        The new name also shows on orders already made with this garment. To offer something
+        different, add a new garment and retire this one instead.
+      </p>
+
+      <ActionProblem message={problem} />
+
+      <div className="row-actions" style={{ marginTop: 0 }}>
+        <button type="submit" className="btn" disabled={busy || name.trim() === ""}>
+          {busy ? "Saving…" : "Save"}
+        </button>
+        <button type="button" className="btn quiet" onClick={onCancel} disabled={busy}>
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }

@@ -27,12 +27,26 @@ interface Group {
  */
 const GROUPS: Group[] = [
   {
-    items: [{ to: "/", label: "Dashboard", icon: "home", end: true }],
+    items: [
+      { to: "/", label: "Dashboard", icon: "home", end: true, allow: ["tailor", "customer"] },
+      /*
+       * An admin's dashboard IS the overview: "/" redirects her to /admin. A
+       * separate "Overview" link was a second door to the same room, and the
+       * Dashboard link never lit up there because the address is /admin.
+       */
+      { to: "/admin", label: "Dashboard", icon: "home", end: true, allow: ["admin"] },
+    ],
   },
   {
     heading: "Production",
     items: [
-      { to: "/orders", label: "Orders", icon: "check" },
+      /*
+       * Not for admins. This list is "orders I am on", and an admin is never
+       * the customer or the tailor, so for her it was always empty. Hers is
+       * "All orders" under Administration.
+       */
+      { to: "/orders", label: "Orders", icon: "check", allow: ["tailor", "customer"] },
+      { to: "/customers", label: "Your customers", icon: "user", allow: ["tailor"] },
       /*
        * Not for customers. The page is a catalogue of garment types and the
        * production stages behind them -- an admin curates it and a tailor
@@ -41,6 +55,12 @@ const GROUPS: Group[] = [
        * A nav link she can only read and leave teaches her the menu is
        * scenery.
        */
+      /*
+       * Production, not Administration: the stages and their recordings are
+       * what every garment is built from, so for an admin they sit with the
+       * garments they make up -- above them, as the parts come before the whole.
+       */
+      { to: "/admin/steps", label: "Step library", icon: "list", allow: ["admin"] },
       { to: "/garments", label: "Garments", icon: "garment", allow: ["tailor", "admin"] },
       { to: "/portfolio", label: "Your gallery", icon: "image", allow: ["tailor"] },
       { to: "/card", label: "Your card", icon: "qr", allow: ["tailor"] },
@@ -50,13 +70,10 @@ const GROUPS: Group[] = [
   {
     heading: "Administration",
     items: [
-      { to: "/admin", label: "Overview", icon: "home", allow: ["admin"], end: true },
       { to: "/admin/orders", label: "All orders", icon: "list", allow: ["admin"] },
       { to: "/admin/people", label: "People", icon: "user", allow: ["admin"] },
       { to: "/admin/disputes", label: "Disputes", icon: "lock", allow: ["admin"] },
       { to: "/admin/reviews", label: "Reviews to check", icon: "star", allow: ["admin"] },
-      { to: "/admin/steps", label: "Step library", icon: "list", allow: ["admin"] },
-      { to: "/admin/settings", label: "Settings", icon: "cog", allow: ["admin"] },
     ],
   },
   {
@@ -85,6 +102,9 @@ const GROUPS: Group[] = [
       { to: "/profile", label: "Your details", icon: "user" },
       { to: "/settings/bank", label: "Where you get paid", icon: "check", allow: ["tailor"] },
       { to: "/settings/alerts", label: "Alerts", icon: "cog" },
+      // Last in Account, for an admin: the platform's numbers, kept apart
+      // from the day-to-day queues above.
+      { to: "/admin/settings", label: "Settings", icon: "cog", allow: ["admin"] },
     ],
   },
 ];
