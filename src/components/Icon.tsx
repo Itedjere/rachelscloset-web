@@ -59,6 +59,33 @@ const GLYPHS: Record<string, Glyph> = {
   trash: { path: "M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" },
   menu: { path: "M3 6h18M3 12h18M3 18h18" },
   close: { path: "M18 6 6 18M6 6l12 12" },
+
+  /* ---- The doors in: sign-in and joining. ---- */
+
+  // A handset outline, for "your phone number" -- the username here.
+  phone: { path: "M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM11 18h2" },
+  // Scissors: "I sew". Recognisable to anybody who has stood in a shop.
+  scissors: {
+    path: "M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12",
+    circles: [
+      [6, 6, 3],
+      [6, 18, 3],
+    ],
+  },
+  // A hanger: "I want clothes made".
+  hanger: {
+    path: "M10 5.5a2 2 0 1 1 3 1.7c-.6.4-1 .9-1 1.6V9l8.6 5.7a1 1 0 0 1-.6 1.8H4a1 1 0 0 1-.6-1.8L12 9",
+  },
+  store: { path: "M3 9 4.5 4h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6" },
+  pin: { path: "M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0Z", circles: [[12, 10, 3]] },
+  map: { path: "M2 6v16l7-4 6 4 7-4V2l-7 4-6-4-7 4ZM9 2v16M15 6v16" },
+  eye: { path: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z", circles: [[12, 12, 3]] },
+  shield: { path: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10ZM9 12l2 2 4-4" },
+  key: { path: "M11.5 11.5 21 2M17 6l3 3M14.5 8.5 17 11", circles: [[7.5, 15.5, 5]] },
+  chat: { path: "M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5Z" },
+  spark: { path: "M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2ZM19 3v4M17 5h4" },
+  arrow: { path: "M5 12h14M13 6l6 6-6 6" },
+  back: { path: "M19 12H5M11 6l-6 6 6 6" },
 };
 
 export default function Icon({ name, size = 20 }: { name: string; size?: number }) {

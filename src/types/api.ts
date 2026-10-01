@@ -44,6 +44,8 @@ export interface ServerConfig {
   support_phone: string | null;
   /** wa.me link to that number, built server-side. */
   support_whatsapp: string | null;
+  /** Nigeria's states, spelled the one way the directory filters by. */
+  states: string[];
 }
 
 export interface ResourceResponse<T> {

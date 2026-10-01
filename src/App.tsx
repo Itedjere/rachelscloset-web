@@ -28,6 +28,7 @@ import HeldReviews from "./pages/admin/HeldReviews";
 import People from "./pages/admin/People";
 import Customers from "./pages/Customers";
 import ForgotPin from "./pages/ForgotPin";
+import Join from "./pages/Join";
 import PinReset from "./pages/PinReset";
 import Settings from "./pages/admin/Settings";
 import StepLibrary from "./pages/admin/StepLibrary";
@@ -39,6 +40,8 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/sign-in" element={<SignIn />} />
+        {/* Outside ProtectedRoute: the whole point is that she has no account. */}
+        <Route path="/join" element={<Join />} />
 
         {/*
           Claiming is deliberately outside ProtectedRoute: the whole point is

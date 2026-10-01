@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { SITE_URL } from "../lib/site";
 import AvatarMenu from "./AvatarMenu";
 import Icon from "./Icon";
 import NotificationBell from "./NotificationBell";
@@ -74,12 +75,19 @@ export default function Layout() {
     return (
       <>
         <header className="app-header">
-          <Link to="/" className="brand">
+          {/* Out to the public site, not to "/": signed out, "/" only bounces
+              back to sign-in, so the logo went nowhere. Somebody who tapped
+              "Sign in" on the directory by mistake needs a way back to it. */}
+          <a href={SITE_URL} className="brand" title="Back to Rachels Closet">
             <img src="/brand/mark.svg" width="32" height="32" alt="" aria-hidden="true" />
-            <span>Rachel&rsquo;s Closet</span>
-          </Link>
+            <span>Rachels Closet</span>
+          </a>
 
           <div className="app-header__actions">
+            <a href={SITE_URL} className="app-header__site">
+              <Icon name="back" size={16} />
+              <span>Back to the site</span>
+            </a>
             <ThemeToggle />
           </div>
         </header>
@@ -108,7 +116,7 @@ export default function Layout() {
 
         <Link to="/" className="brand">
           <img src="/brand/mark.svg" width="32" height="32" alt="" aria-hidden="true" />
-          <span>Rachel&rsquo;s Closet</span>
+          <span>Rachels Closet</span>
         </Link>
 
         <div className="app-header__actions">
