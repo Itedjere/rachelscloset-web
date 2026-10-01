@@ -179,6 +179,16 @@ export interface FoundCustomer {
   claimed: boolean;
 }
 
+/** One of the tailor's own customers: somebody she has had an order with. */
+export interface MyCustomer extends FoundCustomer {
+  orders_count: number;
+  /** Waiting to pay, being made, or ready to collect. */
+  live_orders_count: number;
+  last_order_at: string | null;
+  /** A live order or her consent; a finished order does not keep granting it. */
+  can_see_measurements: boolean;
+}
+
 /* ---- Measurements (Section 11) ------------------------------------------ */
 
 export interface MeasurementValue {

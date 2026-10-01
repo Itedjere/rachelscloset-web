@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import MoneyInput from "../components/MoneyInput";
 import { ApiError, api, errorMessage } from "../lib/api";
@@ -16,7 +16,12 @@ import type { FoundCustomer, GarmentType, Order, ResourceResponse } from "../typ
 export default function OrderNew() {
   const navigate = useNavigate();
 
-  const [phone, setPhone] = useState("");
+  // "New order" on her customer list arrives with the number already known,
+  // so the customer is found before the page has finished drawing.
+  const [params] = useSearchParams();
+  const presetPhone = params.get("phone") ?? "";
+
+  const [phone, setPhone] = useState(presetPhone);
   const [customer, setCustomer] = useState<FoundCustomer | null>(null);
   const [looking, setLooking] = useState(false);
   const [lookupProblem, setLookupProblem] = useState<string | null>(null);
@@ -25,6 +30,8 @@ export default function OrderNew() {
   const [notFound, setNotFound] = useState(false);
   const [newName, setNewName] = useState("");
   const [adding, setAdding] = useState(false);
+  // Its own, so it shows under "Add her" rather than in the card above.
+  const [addProblem, setAddProblem] = useState<string | null>(null);
 
   const [garments, setGarments] = useState<GarmentType[]>([]);
   const [garmentTypeId, setGarmentTypeId] = useState<string>("");
@@ -45,8 +52,18 @@ export default function OrderNew() {
       .catch((error: unknown) => setProblem(errorMessage(error)));
   }, []);
 
+  useEffect(() => {
+    if (presetPhone !== "") void lookup(presetPhone);
+    // Once, for the number the link carried; typing afterwards is her own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function findCustomer(event: React.FormEvent) {
     event.preventDefault();
+    await lookup(phone);
+  }
+
+  async function lookup(number: string) {
     setLooking(true);
     setLookupProblem(null);
     setNotFound(false);
@@ -54,7 +71,7 @@ export default function OrderNew() {
 
     try {
       const response = await api.get<ResourceResponse<FoundCustomer>>(
-        `/customers/lookup?phone=${encodeURIComponent(phone)}`,
+        `/customers/lookup?phone=${encodeURIComponent(number)}`,
       );
       setCustomer(response.data);
     } catch (error: unknown) {
@@ -77,7 +94,7 @@ export default function OrderNew() {
   async function addCustomer(event: React.FormEvent) {
     event.preventDefault();
     setAdding(true);
-    setLookupProblem(null);
+    setAddProblem(null);
 
     try {
       const response = await api.post<ResourceResponse<FoundCustomer>>("/customers", {
@@ -88,7 +105,7 @@ export default function OrderNew() {
       setNotFound(false);
       setNewName("");
     } catch (error: unknown) {
-      setLookupProblem(errorMessage(error));
+      setAddProblem(errorMessage(error));
     } finally {
       setAdding(false);
     }
@@ -110,7 +127,7 @@ export default function OrderNew() {
         amount: Number(amount),
         deposit_amount: deposit ? Number(deposit) : 0,
         escrow,
-        due_date: dueDate || null,
+        due_date: dueDate,
       });
 
       navigate(`/orders/${response.data.id}`);
@@ -128,8 +145,6 @@ export default function OrderNew() {
         <h1>Open an order</h1>
         <p>Find the customer by her phone number, then say what you are making.</p>
       </div>
-
-      {problem ? <p className="notice bad">{problem}</p> : null}
 
       <form className="card" onSubmit={findCustomer} style={{ marginBottom: 16 }}>
         <div className="field" style={{ marginBottom: 12 }}>
@@ -197,6 +212,8 @@ export default function OrderNew() {
             />
           </div>
 
+          {addProblem ? <p className="notice bad">{addProblem}</p> : null}
+
           <button type="submit" className="btn" disabled={adding || newName.trim() === ""}>
             {adding ? "Adding…" : `Add her with ${phone.trim()}`}
           </button>
@@ -248,24 +265,48 @@ export default function OrderNew() {
             ) : null}
           </div>
 
+          {/*
+            Required. It is the promise she is making, shown to the customer
+            as "Promised for" -- and "she promised a date and had not started"
+            is the first problem this platform exists to fix.
+          */}
           <div className="field">
-            <label htmlFor="due">Promised for (optional)</label>
-            <input id="due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            <label htmlFor="due">Ready by — the date you promise her</label>
+            <input
+              id="due"
+              type="date"
+              required
+              min={today()}
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+            <p className="hint">She sees this date on her order.</p>
+            {fieldErrors.due_date ? <p className="error">{fieldErrors.due_date[0]}</p> : null}
           </div>
 
           <label className="switch-row" style={{ borderBottom: 0 }}>
             <div className="text">
               <div className="label">Hold the money until she collects</div>
               <div className="hint">
-                The platform keeps it and pays you when the garment is handed over. Costs you
-                nothing — the charge is absorbed.
+                {escrow
+                  ? "She pays Rachel's Closet, which keeps it and pays you when the garment is handed over. Costs you nothing."
+                  : "Off: she pays you herself — cash, transfer or POS — and you mark it paid here."}
               </div>
             </div>
             <input type="checkbox" checked={escrow} onChange={(e) => setEscrow(e.target.checked)} />
           </label>
 
+          {/* Beside the button that caused it, not at the top of the page --
+              on a phone the top is a scroll away, and the form would just
+              seem not to submit. */}
+          {problem ? <p className="notice bad">{problem}</p> : null}
+
           <div className="row-actions">
-            <button type="submit" className="btn" disabled={saving || !garmentTypeId || !amount}>
+            <button
+              type="submit"
+              className="btn"
+              disabled={saving || !garmentTypeId || !amount || !dueDate}
+            >
               {saving ? "Opening…" : `Open order${amount ? ` for ${naira(amount)}` : ""}`}
             </button>
           </div>
@@ -273,4 +314,16 @@ export default function OrderNew() {
       ) : null}
     </>
   );
+}
+
+/**
+ * Today as YYYY-MM-DD in local time, for the date field's `min`.
+ * Not toISOString(), which is UTC and would still read "yesterday" for the
+ * first hour after midnight in Lagos.
+ */
+function today(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }

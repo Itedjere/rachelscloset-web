@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
+import { useAuth } from "./hooks/useAuth";
 import AlertSettings from "./pages/AlertSettings";
 import Home from "./pages/Home";
 import Arrangement from "./pages/Arrangement";
@@ -25,6 +26,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import Disputes from "./pages/admin/Disputes";
 import HeldReviews from "./pages/admin/HeldReviews";
 import People from "./pages/admin/People";
+import Customers from "./pages/Customers";
 import ForgotPin from "./pages/ForgotPin";
 import PinReset from "./pages/PinReset";
 import Settings from "./pages/admin/Settings";
@@ -85,7 +87,7 @@ export default function App() {
           path="/orders"
           element={
             <ProtectedRoute>
-              <Orders />
+              <OrdersForRole />
             </ProtectedRoute>
           }
         />
@@ -121,6 +123,15 @@ export default function App() {
             <ProtectedRoute>
               <Measurements />
             </ProtectedRoute>
+          }
+        />
+        {/* Her own customers: the people she has sewn for. */}
+        <Route
+          path="/customers"
+          element={
+            <RoleRoute allow={["tailor"]}>
+              <Customers />
+            </RoleRoute>
           }
         />
         {/* A customer's, for the tailor working with her. */}
@@ -278,4 +289,20 @@ export default function App() {
       </Route>
     </Routes>
   );
+}
+
+/**
+ * "Your orders" for the two people on them; "All orders" for an admin.
+ *
+ * The list behind /orders is scoped to orders the viewer is ON, and an admin
+ * is never the customer or the tailor -- so for her it was an empty page with
+ * an Orders link pointing at it. An old bookmark or a typed address lands her
+ * on the list that is actually hers.
+ */
+function OrdersForRole() {
+  const { user } = useAuth();
+
+  if (user?.role === "admin") return <Navigate to="/admin/orders" replace />;
+
+  return <Orders />;
 }

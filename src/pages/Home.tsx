@@ -58,6 +58,14 @@ export default function Home() {
           </p>
         </Link>
 
+        {isTailor ? (
+          <Link className="tile" to="/customers">
+            <Icon name="user" size={22} />
+            <h2>Your customers</h2>
+            <p>Everybody you have sewn for. Start a new order for any of them in one tap.</p>
+          </Link>
+        ) : null}
+
         {/* Not a customer's page -- the route refuses her too. */}
         {isAdmin || isTailor ? (
           <Link className="tile" to="/garments">

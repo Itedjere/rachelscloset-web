@@ -724,6 +724,42 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* A retired garment: still listed for the admin, visibly out of use. */
+.arrangement__step.is-retired {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+/* Renaming a garment, in place on its row. */
+.garment-editor {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.garment-editor .field {
+  margin: 0;
+}
+
+/* An admin's form for one stage, opened directly under that stage's row. */
+.arrangement__editor {
+  list-style: none;
+}
+
+.arrangement__editor > .card {
+  margin: 0;
+  border-color: var(--plum);
+  box-shadow: var(--shadow);
+}
+
+/* "Record what it means" -- a labelled button, quiet beside the player. */
+.arrangement__record {
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
 .arrangement__body {
   flex: 1;
   min-width: 0;
@@ -772,6 +808,9 @@ a {
   .arrangement__arrows {
     width: 100%;
     justify-content: flex-end;
+    /* An admin's garment row carries five controls -- Stages, two arrows,
+       Rename, Retire -- which do not fit one line on a phone. */
+    flex-wrap: wrap;
   }
 }
 
@@ -3462,6 +3501,12 @@ button.stage__tick:not(:disabled):active .stage__mark {
   background: var(--surface-2);
 }
 
+/* A failed remove shows under its own entry, across the whole row. */
+.direct-pay__list li > .notice {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+}
+
 .direct-pay__amount {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -3506,4 +3551,124 @@ button.stage__tick:not(:disabled):active .stage__mark {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface-2);
+}
+
+/* ---------------------------------------------------------------------------
+   Her customers
+
+   A row per person she has sewn for: who, a number that rings on tap, how
+   much she has made for them, and the two things she comes here to do.
+   --------------------------------------------------------------------------- */
+
+.customer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.customer-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.customer-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-row__main strong {
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.customer-row__phone {
+  width: fit-content;
+  font-variant-numeric: tabular-nums;
+  color: var(--plum);
+  text-decoration: none;
+}
+
+.customer-row__main .hint {
+  margin: 0;
+}
+
+.customer-row__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.customer-row__tags:empty {
+  display: none;
+}
+
+.customer-row__actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.customer-row__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+/* Dimmed, not emptied, while the next page or search is on its way: an empty
+   list for half a second reads as "nobody". */
+.customer-list.is-loading {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+/* ---- Previous / next -------------------------------------------------------- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pager .btn {
+  min-height: 44px;
+}
+
+.pager__where {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* A phone: the actions drop under the person, full width under a thumb. */
+@media (max-width: 560px) {
+  .customer-row {
+    flex-wrap: wrap;
+  }
+
+  .customer-row__actions {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .customer-row__actions .btn {
+    flex: 1;
+  }
 }
