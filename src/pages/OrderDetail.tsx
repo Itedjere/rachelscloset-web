@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import ClaimInvite from "../components/ClaimInvite";
+import DirectPayments from "../components/DirectPayments";
 import Icon from "../components/Icon";
 import OrderStatusPill from "../components/OrderStatusPill";
 import OrderPhotos from "../components/OrderPhotos";
@@ -174,11 +175,21 @@ export default function OrderDetail() {
           </div>
         </dl>
 
-        {/* Only the customer pays, and only while something is outstanding. */}
-        {!isTailor && order.status === "pending_payment" ? (
+        {/*
+          Only the customer pays, only while something is outstanding, and
+          only on an order Rachel's Closet holds the money for. On a direct
+          order this button used to charge her into the PLATFORM's account,
+          with nothing recorded as owed to the tailor.
+        */}
+        {!isTailor && order.escrow && order.status === "pending_payment" ? (
           <button type="button" className="btn" onClick={() => void pay()} disabled={busy}>
             {busy ? "Opening…" : `Pay ${naira(order.amount_due_up_front)}`}
           </button>
+        ) : null}
+
+        {/* A direct order: paid by hand, recorded by the tailor. */}
+        {!order.escrow ? (
+          <DirectPayments order={order} isTailor={isTailor} onChanged={() => void load()} />
         ) : null}
       </div>
 

@@ -3419,3 +3419,91 @@ button.stage__tick:not(:disabled):active .stage__mark {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Money handed over by hand, on a direct order
+
+   The list is both people's receipt; the form is the tailor saying what she
+   was given. Amounts are chosen before they are typed -- see DirectPayments.
+   --------------------------------------------------------------------------- */
+
+.direct-pay {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.direct-pay > .btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+}
+
+.direct-pay__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.direct-pay__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--success);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.direct-pay__amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.direct-pay__list .hint {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Smaller than a 44px target on purpose: the one control here that should be
+   harder to hit than the row, because it changes what she is told she owes. */
+.direct-pay__remove {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-mute);
+  cursor: pointer;
+}
+
+.direct-pay__remove:hover,
+.direct-pay__remove:focus-visible {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.direct-pay__confirm {
+  display: flex;
+  gap: 8px;
+}
+
+.direct-pay__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}

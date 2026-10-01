@@ -123,6 +123,12 @@ export interface OrderStep {
   photos?: StepPhoto[];
 }
 
+export interface DirectPayment {
+  id: number;
+  amount: string;
+  paid_at: string;
+}
+
 export interface Order {
   id: number;
   reference: string;
@@ -134,6 +140,8 @@ export interface Order {
   amount_due_up_front: string;
   is_paid_up_front: boolean;
   escrow: boolean;
+  /** Money handed to the tailor on a direct order, as she recorded it. Empty on escrow orders. */
+  direct_payments: DirectPayment[];
   due_date: string | null;
   ready_at: string | null;
   collection_deadline: string | null;
