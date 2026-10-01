@@ -87,7 +87,7 @@ export default function OrderDispute({
 
   if (dispute) {
     return (
-      <div className={`card dispute dispute--${dispute.status}`}>
+      <div className={`card dispute dispute--${dispute.status}`} style={{ marginBottom: 16 }}>
         <h2 style={{ fontSize: 18 }}>
           {dispute.status === "open" ? "We are looking into this" : "This was settled"}
         </h2>
@@ -116,7 +116,9 @@ export default function OrderDispute({
   if (!canRaise) return null;
 
   return (
-    <div className="card">
+    // Spaced like every other card on the order page; without it this one
+    // sat flush against "You wearing it" below.
+    <div className="card" style={{ marginBottom: 16 }}>
       <h2 style={{ fontSize: 18 }}>Is something wrong with this order?</h2>
       <p className="hint">
         Tell Rachel's Closet. The money stays put until somebody has called you both.

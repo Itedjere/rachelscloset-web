@@ -246,7 +246,7 @@ export default function OrderDetail() {
         ticking a box is the shape this platform avoids everywhere else.
       */}
       {isTailor && order.status === "ready" ? (
-        <div className="card">
+        <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Has it gone?</h2>
           <p className="hint">
             If you posted it, your money waits until she says it reached her.
@@ -277,7 +277,7 @@ export default function OrderDetail() {
         says so, and nothing else on the platform can know when it did.
       */}
       {!isTailor && order.status === "collected" && !order.received_at ? (
-        <div className="card">
+        <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Has it reached you?</h2>
           <p className="hint">
             Your tailor posted this one to you. Tap here when it reaches you, and Rachel's
@@ -295,7 +295,7 @@ export default function OrderDetail() {
         wait for.
       */}
       {!isTailor && order.status === "collected" && order.escrow && order.received_at && !disputed ? (
-        <div className="card">
+        <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Is everything right?</h2>
           <p className="hint">
             Saying yes sends your tailor her money straight away. If you say nothing, Rachel's
@@ -310,7 +310,7 @@ export default function OrderDetail() {
       {/* And the slow path: hers to take, so a stopped sweep costs a tap
           rather than her wages. */}
       {isTailor && order.escrow && order.can_release ? (
-        <div className="card">
+        <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>Your money is ready</h2>
           <p className="hint">The waiting time is over. Send it to your bank account.</p>
           <button type="button" className="btn" onClick={() => void act("release")} disabled={busy}>
@@ -320,7 +320,7 @@ export default function OrderDetail() {
       ) : null}
 
       {order.payout ? (
-        <div className="card">
+        <div className="card" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 18 }}>
             {isTailor ? "Your money for this job" : "Your tailor's money"}
           </h2>

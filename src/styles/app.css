@@ -2236,6 +2236,20 @@ button.stage__tick:not(:disabled):active .stage__mark {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
+  /* Even space between the stars, the box and the button -- the button sat
+     flush against the textarea above it. */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.review-form > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.review-form > .btn {
+  align-self: flex-start;
 }
 
 /* ---- The held queue ------------------------------------------------------- */
@@ -3404,3 +3418,4 @@ button.stage__tick:not(:disabled):active .stage__mark {
     transition: none;
   }
 }
+
