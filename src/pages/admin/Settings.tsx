@@ -37,24 +37,35 @@ export default function Settings() {
     void load();
   }, [load]);
 
-  async function save(row: PlatformSettingRow, value: string) {
-    if (value === "" || value === row.value) return;
+  /** Whether it saved, so a controlled row can put its old value back. */
+  async function save(row: PlatformSettingRow, value: string): Promise<boolean> {
+    if (value === "" || value === row.value) return true;
 
     setSavingKey(row.key);
     setProblem(null);
 
     try {
-      await api.put("/admin/settings", { key: row.key, value: Number(value) });
+      // A phone row goes as text: Number("08152070480") drops the leading
+      // zero and turns a valid number into an invalid one.
+      const response = await api.put<{ data: { value: string } }>("/admin/settings", {
+        key: row.key,
+        value: row.phone ? value : Number(value),
+      });
+      // The server's copy, which for a phone is the normalised form.
       setRows((current) =>
-        current.map((r) => (r.key === row.key ? { ...r, value } : r)),
+        current.map((r) => (r.key === row.key ? { ...r, value: response.data.value } : r)),
       );
       setSavedKey(row.key);
       window.setTimeout(() => setSavedKey(null), 2000);
+
+      return true;
     } catch (error: unknown) {
       setProblem(errorMessage(error));
       // Put the old value back rather than leave a number on screen that is
       // not the one in the database.
       setRows((current) => [...current]);
+
+      return false;
     } finally {
       setSavingKey(null);
     }
@@ -84,7 +95,9 @@ export default function Settings() {
                 <span>{row.label}</span>
                 {/* Two of these rows are naira and the rest are days,
                     counts and percentages. The server says which. */}
-                {row.money ? (
+                {row.phone ? (
+                  <PhoneSetting row={row} busy={savingKey === row.key} onSave={save} />
+                ) : row.money ? (
                   <MoneySetting row={row} busy={savingKey === row.key} onSave={save} />
                 ) : (
                   <input
@@ -98,7 +111,8 @@ export default function Settings() {
                   />
                 )}
                 <p className="hint">
-                  {row.help} Between {row.min} and {row.max}.
+                  {row.help}
+                  {row.phone ? null : ` Between ${row.min} and ${row.max}.`}
                   {savedKey === row.key ? <strong> Saved.</strong> : null}
                 </p>
               </label>
@@ -124,7 +138,7 @@ function MoneySetting({
 }: {
   row: PlatformSettingRow;
   busy: boolean;
-  onSave: (row: PlatformSettingRow, value: string) => Promise<void> | void;
+  onSave: (row: PlatformSettingRow, value: string) => Promise<boolean>;
 }) {
   const [value, setValue] = useState(row.value);
 
@@ -132,5 +146,43 @@ function MoneySetting({
     <span onBlur={() => void onSave(row, value)}>
       <MoneyInput value={value} onChange={setValue} disabled={busy} max={String(row.max)} />
     </span>
+  );
+}
+
+/**
+ * The help line's phone number.
+ *
+ * Controlled, like the money rows, so it can show the stored form once saved
+ * ("+234 815..." comes back as 0815...) and snap back to the working number
+ * if the new one is refused -- a half-typed number left on screen would look
+ * saved when the page a locked-out person reads still shows the old one.
+ */
+function PhoneSetting({
+  row,
+  busy,
+  onSave,
+}: {
+  row: PlatformSettingRow;
+  busy: boolean;
+  onSave: (row: PlatformSettingRow, value: string) => Promise<boolean>;
+}) {
+  const [value, setValue] = useState(row.value);
+
+  useEffect(() => setValue(row.value), [row.value]);
+
+  return (
+    <input
+      type="tel"
+      inputMode="tel"
+      autoComplete="off"
+      value={value}
+      disabled={busy}
+      onChange={(event) => setValue(event.target.value)}
+      onBlur={() =>
+        void onSave(row, value.trim()).then((ok) => {
+          if (!ok) setValue(row.value);
+        })
+      }
+    />
   );
 }

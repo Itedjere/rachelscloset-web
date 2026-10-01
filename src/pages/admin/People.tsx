@@ -325,13 +325,21 @@ function ResetPanel({
               Send it on WhatsApp
             </a>
 
+            {/* The whole sentence, address included, like the tailor's claim
+                card: six digits with nowhere to type them are no help to
+                somebody already locked out. */}
             <div className="invite-code">
-              <span className="hint">Or read her these numbers:</span>
+              <span className="hint">On the phone? Say:</span>
+              <p className="invite-script">
+                “Go to <strong>{issued.reset_page.replace(/^https?:\/\//, "")}</strong>. Type
+                your phone number, then these six numbers:”
+              </p>
               <strong>{issued.code}</strong>
             </div>
 
             <p className="hint">
-              She will be asked for her phone number too, so the numbers only work for her.
+              She will be asked for her phone number too, so the numbers only work for her. She
+              can also tap “Forgot your PIN?” on the sign-in page.
             </p>
           </div>
         </div>

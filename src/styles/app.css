@@ -1863,6 +1863,13 @@ a {
   color: var(--ink);
 }
 
+/* Call and WhatsApp on the forgot-PIN page: stacked, full width, thumb-sized. */
+.support-contact {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+
 /* What to say down the phone, word for word. */
 .invite-script {
   margin: 4px 0 6px;

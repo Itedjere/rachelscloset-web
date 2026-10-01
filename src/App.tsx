@@ -25,6 +25,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import Disputes from "./pages/admin/Disputes";
 import HeldReviews from "./pages/admin/HeldReviews";
 import People from "./pages/admin/People";
+import ForgotPin from "./pages/ForgotPin";
 import PinReset from "./pages/PinReset";
 import Settings from "./pages/admin/Settings";
 import StepLibrary from "./pages/admin/StepLibrary";
@@ -54,6 +55,7 @@ export default function App() {
         */}
         <Route path="/reset" element={<PinReset />} />
         <Route path="/reset/:token" element={<PinReset />} />
+        <Route path="/forgot" element={<ForgotPin />} />
 
         <Route
           path="/"

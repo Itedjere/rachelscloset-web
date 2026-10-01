@@ -104,6 +104,12 @@ export default function SignIn() {
       <Link className="btn quiet block" to="/claim" style={{ marginTop: 12 }}>
         My tailor read me six numbers
       </Link>
+
+      {/* Nothing here sends a reset by SMS or email, so this leads to the
+          phone number to ring rather than to a form. */}
+      <p style={{ marginTop: 16, textAlign: "center" }}>
+        <Link to="/forgot">Forgot your PIN?</Link>
+      </p>
     </div>
   );
 }

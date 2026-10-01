@@ -40,6 +40,10 @@ export interface ServerConfig {
   max_upload_kb: number;
   max_upload_label: string;
   push: { enabled: boolean; public_key: string | null };
+  /** Who a locked-out person rings. Null until an admin sets one. */
+  support_phone: string | null;
+  /** wa.me link to that number, built server-side. */
+  support_whatsapp: string | null;
 }
 
 export interface ResourceResponse<T> {
@@ -283,6 +287,8 @@ export interface PlatformSettingRow {
   group: string;
   /** Naira rather than days or a percentage, so the field groups digits. */
   money: boolean;
+  /** A phone number rather than a number of anything; min and max mean nothing. */
+  phone: boolean;
 }
 
 /* ---- The business card (Section 16) -------------------------------------- */
@@ -384,6 +390,8 @@ export interface AdminUser {
 /** An admin-issued way back in for somebody locked out. All channels free. */
 export interface PinResetIssue {
   code: string;
+  /** Where a spoken code is typed in, e.g. https://…/reset. */
+  reset_page: string;
   link: string;
   qr_svg: string;
   whatsapp_url: string;
