@@ -18,6 +18,15 @@
     RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+    # On the live host this folder is also reachable as
+    # rachelscloset.com.ng/app.rachelscloset.com.ng/ -- cPanel keeps
+    # subdomain folders inside public_html, which is Laravel's public folder.
+    # Served from there the app's /assets/ links miss and the page is blank,
+    # so anything that arrives by any other host is sent to the real address.
+    RewriteCond %{HTTP_HOST} !^app\. [NC]
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+    RewriteRule ^(.*)$ https://app.rachelscloset.com.ng/$1 [L,R=301]
+
     # A real file or folder is served as itself...
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
